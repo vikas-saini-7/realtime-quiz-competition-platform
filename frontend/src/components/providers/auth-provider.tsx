@@ -25,23 +25,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [accessToken]);
 
-  // Route protection
+  // Route protection and redirection
   useEffect(() => {
     if (!isHydrated) return;
 
     const isPublicPath = publicPaths.includes(pathname);
 
+    // If not authenticated and not on a public path, redirect to login
     if (!isAuthenticated && !isPublicPath) {
       router.push("/auth/login");
+      return;
+    }
+
+    // If authenticated and on login/register, redirect to dashboard
+    if (
+      isAuthenticated &&
+      user &&
+      ["/auth/login", "/auth/register"].includes(pathname)
+    ) {
+      if (user.role === "HOST") {
+        router.replace("/host/dashboard");
+      } else {
+        router.replace("/play/browse");
+      }
       return;
     }
 
     // Role-based access control
     if (isAuthenticated && user) {
       if (pathname.startsWith("/host") && user.role !== "HOST") {
-        router.push("/play/browse");
+        router.replace("/play/browse");
         return;
       }
+      // Optionally, restrict /play to USERs only (if needed)
+      // if (pathname.startsWith("/play") && user.role !== "USER") {
+      //   router.replace("/host/dashboard");
+      //   return;
+      // }
     }
   }, [isAuthenticated, pathname, router, isHydrated, user]);
 
