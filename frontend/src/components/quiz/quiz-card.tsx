@@ -10,7 +10,12 @@ import {
   IconTrash,
   IconQuestionMark,
 } from "@tabler/icons-react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Quiz, QuizStatus } from "@/types";
@@ -61,14 +66,20 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
             <div className="flex items-center gap-2">
               <IconCalendar className="h-4 w-4" />
               <span>
-                Scheduled {formatDistanceToNow(new Date(quiz.scheduledAt), { addSuffix: true })}
+                Scheduled{" "}
+                {formatDistanceToNow(new Date(quiz.scheduledAt), {
+                  addSuffix: true,
+                })}
               </span>
             </div>
           )}
           <div className="flex items-center gap-2">
             <IconCalendar className="h-4 w-4" />
             <span>
-              Created {formatDistanceToNow(new Date(quiz.createdAt), { addSuffix: true })}
+              Created{" "}
+              {formatDistanceToNow(new Date(quiz.createdAt), {
+                addSuffix: true,
+              })}
             </span>
           </div>
         </div>

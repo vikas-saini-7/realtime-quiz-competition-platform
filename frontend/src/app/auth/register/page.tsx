@@ -52,7 +52,8 @@ export default function RegisterPage() {
   const { setAuth } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
 
-  const defaultRole = (searchParams.get("role")?.toUpperCase() || "USER") as UserRole;
+  const defaultRole = (searchParams.get("role")?.toUpperCase() ||
+    "USER") as UserRole;
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -79,7 +80,8 @@ export default function RegisterPage() {
         router.push("/play/browse");
       }
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Registration failed";
+      const message =
+        error instanceof Error ? error.message : "Registration failed";
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -96,9 +98,7 @@ export default function RegisterPage() {
           </div>
         </div>
         <CardTitle className="text-2xl">Create an account</CardTitle>
-        <CardDescription>
-          Get started with your free account
-        </CardDescription>
+        <CardDescription>Get started with your free account</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -110,7 +110,11 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" autoComplete="name" {...field} />
+                    <Input
+                      placeholder="John Doe"
+                      autoComplete="name"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -158,7 +162,10 @@ export default function RegisterPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>I want to</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select your role" />
@@ -166,7 +173,9 @@ export default function RegisterPage() {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="HOST">Host quizzes</SelectItem>
-                      <SelectItem value="USER">Participate in quizzes</SelectItem>
+                      <SelectItem value="USER">
+                        Participate in quizzes
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -174,7 +183,9 @@ export default function RegisterPage() {
               )}
             />
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading && (
+                <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Create Account
             </Button>
           </form>

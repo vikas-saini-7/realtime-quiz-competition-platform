@@ -13,10 +13,16 @@ export function Footer() {
           <Link href="/" className="hover:text-foreground transition-colors">
             Home
           </Link>
-          <Link href="/auth/login" className="hover:text-foreground transition-colors">
+          <Link
+            href="/auth/login"
+            className="hover:text-foreground transition-colors"
+          >
             Login
           </Link>
-          <Link href="/auth/register" className="hover:text-foreground transition-colors">
+          <Link
+            href="/auth/register"
+            className="hover:text-foreground transition-colors"
+          >
             Register
           </Link>
         </nav>

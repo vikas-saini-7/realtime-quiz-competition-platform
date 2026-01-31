@@ -149,7 +149,9 @@ export function useUpdateQuestion() {
     }) => questionService.update(id, data),
     onSuccess: (_, { quizId }) => {
       queryClient.invalidateQueries({ queryKey: ["questions", quizId] });
-      queryClient.invalidateQueries({ queryKey: ["quiz", quizId, "questions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["quiz", quizId, "questions"],
+      });
     },
   });
 }
@@ -161,7 +163,9 @@ export function useDeleteQuestion() {
       questionService.delete(id),
     onSuccess: (_, { quizId }) => {
       queryClient.invalidateQueries({ queryKey: ["questions", quizId] });
-      queryClient.invalidateQueries({ queryKey: ["quiz", quizId, "questions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["quiz", quizId, "questions"],
+      });
     },
   });
 }

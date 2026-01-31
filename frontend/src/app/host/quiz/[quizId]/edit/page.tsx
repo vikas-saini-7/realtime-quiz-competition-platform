@@ -109,10 +109,7 @@ function QuestionCard({
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onUpdate)}
-            className="space-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onUpdate)} className="space-y-4">
             <FormField
               control={form.control}
               name="questionText"
@@ -277,7 +274,7 @@ export default function EditQuizPage() {
 
   const handleUpdateQuestion = async (
     questionId: string,
-    data: QuestionFormValues
+    data: QuestionFormValues,
   ) => {
     try {
       await updateQuestion.mutateAsync({

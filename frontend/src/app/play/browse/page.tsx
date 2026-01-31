@@ -14,7 +14,7 @@ export default function BrowseQuizzesPage() {
   const filteredQuizzes = quizzes?.filter(
     (quiz) =>
       quiz.title.toLowerCase().includes(search.toLowerCase()) ||
-      quiz.description?.toLowerCase().includes(search.toLowerCase())
+      quiz.description?.toLowerCase().includes(search.toLowerCase()),
   );
 
   if (error) {

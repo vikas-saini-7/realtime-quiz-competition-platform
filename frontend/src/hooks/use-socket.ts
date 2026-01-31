@@ -42,7 +42,7 @@ export function useSocket() {
     if (!accessToken || isInitialized.current) return;
 
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "http://localhost:3000";
-    
+
     socket = io(wsUrl, {
       path: "/quiz",
       auth: {
@@ -168,11 +168,11 @@ export function useHostActions() {
             } else {
               reject(new Error("Failed to initialize quiz"));
             }
-          }
+          },
         );
       });
     },
-    [setTotalQuestions, setStatus, setParticipantCount]
+    [setTotalQuestions, setStatus, setParticipantCount],
   );
 
   const startQuiz = useCallback((quizId: string): Promise<void> => {
@@ -191,13 +191,15 @@ export function useHostActions() {
           } else {
             reject(new Error("Failed to start quiz"));
           }
-        }
+        },
       );
     });
   }, []);
 
   const nextQuestion = useCallback(
-    (quizId: string): Promise<{ finished?: boolean; questionIndex?: number }> => {
+    (
+      quizId: string,
+    ): Promise<{ finished?: boolean; questionIndex?: number }> => {
       return new Promise((resolve, reject) => {
         if (!socket) {
           reject(new Error("Socket not connected"));
@@ -217,11 +219,11 @@ export function useHostActions() {
             } else {
               reject(new Error("Failed to advance to next question"));
             }
-          }
+          },
         );
       });
     },
-    []
+    [],
   );
 
   const endQuizEarly = useCallback((quizId: string): Promise<void> => {
@@ -240,7 +242,7 @@ export function useHostActions() {
           } else {
             reject(new Error("Failed to end quiz"));
           }
-        }
+        },
       );
     });
   }, []);
@@ -275,18 +277,18 @@ export function useParticipantActions() {
             } else {
               reject(new Error("Failed to join quiz"));
             }
-          }
+          },
         );
       });
     },
-    [joinQuiz]
+    [joinQuiz],
   );
 
   const submitAnswer = useCallback(
     (
       quizId: string,
       questionId: string,
-      selectedOption: OptionLetter
+      selectedOption: OptionLetter,
     ): Promise<{
       isCorrect: boolean;
       scoreAwarded: number;
@@ -314,11 +316,11 @@ export function useParticipantActions() {
             } else {
               reject(new Error("Failed to submit answer"));
             }
-          }
+          },
         );
       });
     },
-    [setSubmitAnswer]
+    [setSubmitAnswer],
   );
 
   const leaveQuiz = useCallback((quizId: string): Promise<void> => {
@@ -337,7 +339,7 @@ export function useParticipantActions() {
           } else {
             reject(new Error("Failed to leave quiz"));
           }
-        }
+        },
       );
     });
   }, []);
@@ -359,11 +361,11 @@ export function useParticipantActions() {
             } else {
               reject(new Error("Failed to get leaderboard"));
             }
-          }
+          },
         );
       });
     },
-    []
+    [],
   );
 
   return {

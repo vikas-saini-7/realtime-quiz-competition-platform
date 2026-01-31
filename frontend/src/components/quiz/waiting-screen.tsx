@@ -18,7 +18,7 @@ export function WaitingScreen({
     <div
       className={cn(
         "flex flex-col items-center justify-center min-h-[400px] gap-6",
-        className
+        className,
       )}
     >
       <div className="relative">
@@ -29,9 +29,7 @@ export function WaitingScreen({
       </div>
       <div className="text-center space-y-2">
         <h2 className="text-xl font-semibold">{message}</h2>
-        {subMessage && (
-          <p className="text-muted-foreground">{subMessage}</p>
-        )}
+        {subMessage && <p className="text-muted-foreground">{subMessage}</p>}
       </div>
     </div>
   );

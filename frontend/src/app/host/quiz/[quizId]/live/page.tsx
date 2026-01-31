@@ -72,7 +72,14 @@ export default function LiveQuizPage() {
     };
 
     init();
-  }, [isConnected, quizId, status, initializeQuiz, setStatus, setTotalQuestions]);
+  }, [
+    isConnected,
+    quizId,
+    status,
+    initializeQuiz,
+    setStatus,
+    setTotalQuestions,
+  ]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -176,7 +183,9 @@ export default function LiveQuizPage() {
               onClick={handleEndQuiz}
               disabled={isEnding || status === "idle"}
             >
-              {isEnding && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isEnding && (
+                <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               <IconPlayerStop className="h-4 w-4 mr-2" />
               End Quiz
             </Button>
@@ -222,7 +231,9 @@ export default function LiveQuizPage() {
                     <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
                   <IconPlayerSkipForward className="h-5 w-5 mr-2" />
-                  {questionIndex === -1 ? "Show First Question" : "Next Question"}
+                  {questionIndex === -1
+                    ? "Show First Question"
+                    : "Next Question"}
                 </Button>
               ) : status === "finished" ? (
                 <p className="text-center text-muted-foreground py-4">

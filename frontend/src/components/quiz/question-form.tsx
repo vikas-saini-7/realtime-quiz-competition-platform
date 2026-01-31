@@ -93,7 +93,10 @@ export function QuestionForm({
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="questionText"
@@ -142,7 +145,10 @@ export function QuestionForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Correct Answer</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select" />
@@ -172,7 +178,9 @@ export function QuestionForm({
                         min={5}
                         max={120}
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -191,7 +199,9 @@ export function QuestionForm({
                         type="number"
                         min={0}
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -210,7 +220,9 @@ export function QuestionForm({
                         type="number"
                         min={0}
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage />

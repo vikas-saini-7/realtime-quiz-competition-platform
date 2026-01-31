@@ -53,7 +53,7 @@ export function LeaderboardTable({
             <TableRow
               key={entry.userId}
               className={cn(
-                entry.userId === currentUserId && "bg-primary/5 font-medium"
+                entry.userId === currentUserId && "bg-primary/5 font-medium",
               )}
             >
               <TableCell className="font-medium">

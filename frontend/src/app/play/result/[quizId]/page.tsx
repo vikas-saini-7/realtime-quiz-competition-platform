@@ -59,8 +59,8 @@ export default function QuizResultPage() {
                   userRank === 1
                     ? "text-yellow-500"
                     : userRank === 2
-                    ? "text-gray-400"
-                    : "text-amber-600"
+                      ? "text-gray-400"
+                      : "text-amber-600"
                 }`}
               />
             ) : (

@@ -9,7 +9,11 @@ interface ScoreDisplayProps {
   className?: string;
 }
 
-export function ScoreDisplay({ score, lastChange, className }: ScoreDisplayProps) {
+export function ScoreDisplay({
+  score,
+  lastChange,
+  className,
+}: ScoreDisplayProps) {
   const showChange = lastChange !== undefined && lastChange !== 0;
   const isPositive = lastChange && lastChange > 0;
 
@@ -24,7 +28,7 @@ export function ScoreDisplay({ score, lastChange, className }: ScoreDisplayProps
           <span
             className={cn(
               "flex items-center text-sm font-medium",
-              isPositive ? "text-green-500" : "text-red-500"
+              isPositive ? "text-green-500" : "text-red-500",
             )}
           >
             {isPositive ? (

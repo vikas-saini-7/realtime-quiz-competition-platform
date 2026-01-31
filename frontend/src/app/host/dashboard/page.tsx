@@ -16,7 +16,7 @@ export default function HostDashboardPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this quiz?")) return;
-    
+
     try {
       await deleteQuiz.mutateAsync(id);
       toast.success("Quiz deleted successfully");

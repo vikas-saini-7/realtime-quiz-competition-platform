@@ -8,12 +8,15 @@ interface ParticipantCounterProps {
   className?: string;
 }
 
-export function ParticipantCounter({ count, className }: ParticipantCounterProps) {
+export function ParticipantCounter({
+  count,
+  className,
+}: ParticipantCounterProps) {
   return (
     <div
       className={cn(
         "flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary",
-        className
+        className,
       )}
     >
       <IconUsers className="h-5 w-5 text-muted-foreground" />

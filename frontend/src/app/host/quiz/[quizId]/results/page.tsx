@@ -17,9 +17,10 @@ export default function QuizResultsPage() {
   const { data: quiz, isLoading: quizLoading } = useQuiz(quizId);
   const { data: leaderboard, isLoading: leaderboardLoading } = useLeaderboard(
     quizId,
-    50
+    50,
   );
-  const { data: attempts, isLoading: attemptsLoading } = useAttemptsByQuiz(quizId);
+  const { data: attempts, isLoading: attemptsLoading } =
+    useAttemptsByQuiz(quizId);
 
   const isLoading = quizLoading || leaderboardLoading || attemptsLoading;
 
@@ -52,7 +53,7 @@ export default function QuizResultsPage() {
   const averageScore =
     attempts && attempts.length > 0
       ? Math.round(
-          attempts.reduce((acc, a) => acc + a.totalScore, 0) / attempts.length
+          attempts.reduce((acc, a) => acc + a.totalScore, 0) / attempts.length,
         )
       : 0;
   const topScore = leaderboard?.[0]?.score || 0;

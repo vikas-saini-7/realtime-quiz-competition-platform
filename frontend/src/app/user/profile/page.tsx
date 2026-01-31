@@ -1,7 +1,12 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
-import { IconUser, IconMail, IconCalendar, IconShield } from "@tabler/icons-react";
+import {
+  IconUser,
+  IconMail,
+  IconCalendar,
+  IconShield,
+} from "@tabler/icons-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -104,7 +109,9 @@ export default function ProfilePage() {
                 <p className="text-sm text-muted-foreground">Completed</p>
               </div>
               <div className="text-center p-4 rounded-lg bg-secondary/50">
-                <p className="text-3xl font-bold">{totalScore.toLocaleString()}</p>
+                <p className="text-3xl font-bold">
+                  {totalScore.toLocaleString()}
+                </p>
                 <p className="text-sm text-muted-foreground">Total Points</p>
               </div>
             </div>

@@ -64,7 +64,7 @@ api.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 // Auth Service
@@ -109,7 +109,7 @@ export const quizService = {
 
   getWithQuestions: async (id: string): Promise<QuizWithQuestions> => {
     const response = await api.get<QuizWithQuestions>(
-      `/quizzes/${id}/with-questions`
+      `/quizzes/${id}/with-questions`,
     );
     return response.data;
   },
@@ -201,19 +201,19 @@ export const answerService = {
 export const leaderboardService = {
   getByQuizId: async (
     quizId: string,
-    limit?: number
+    limit?: number,
   ): Promise<LeaderboardEntry[]> => {
     const params = limit ? { limit } : {};
     const response = await api.get<LeaderboardEntry[]>(
       `/leaderboard/${quizId}`,
-      { params }
+      { params },
     );
     return response.data;
   },
 
   getMyPosition: async (quizId: string): Promise<LeaderboardEntry> => {
     const response = await api.get<LeaderboardEntry>(
-      `/leaderboard/${quizId}/my-position`
+      `/leaderboard/${quizId}/my-position`,
     );
     return response.data;
   },

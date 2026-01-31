@@ -53,7 +53,10 @@ interface QuizState {
   setQuestion: (event: QuizQuestionEvent) => void;
   submitAnswer: (option: OptionLetter) => void;
   setAnswerResult: (result: AnswerReceivedEvent) => void;
-  setQuestionEnded: (correctOption: OptionLetter, leaderboard: LeaderboardEntry[]) => void;
+  setQuestionEnded: (
+    correctOption: OptionLetter,
+    leaderboard: LeaderboardEntry[],
+  ) => void;
   updateLeaderboard: (leaderboard: LeaderboardEntry[]) => void;
   setParticipantCount: (count: number) => void;
   addParticipant: (id: string, name: string, count: number) => void;

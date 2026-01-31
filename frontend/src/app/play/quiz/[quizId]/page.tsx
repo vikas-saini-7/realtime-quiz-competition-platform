@@ -109,7 +109,7 @@ export default function QuizPlayPage() {
         <Card
           className={cn(
             "border-2",
-            lastAnswerResult?.isCorrect ? "border-green-500" : "border-red-500"
+            lastAnswerResult?.isCorrect ? "border-green-500" : "border-red-500",
           )}
         >
           <CardContent className="py-8 text-center space-y-4">
@@ -136,7 +136,9 @@ export default function QuizPlayPage() {
                   {hasAnswered ? "Incorrect" : "Time's up!"}
                 </h2>
                 {lastAnswerResult && lastAnswerResult.scoreAwarded < 0 && (
-                  <p className="text-lg">{lastAnswerResult.scoreAwarded} points</p>
+                  <p className="text-lg">
+                    {lastAnswerResult.scoreAwarded} points
+                  </p>
                 )}
                 <p className="text-muted-foreground">
                   Correct answer: {correctOption}
@@ -156,7 +158,10 @@ export default function QuizPlayPage() {
             <CardTitle className="text-lg">Current Standings</CardTitle>
           </CardHeader>
           <CardContent>
-            <LeaderboardTable entries={leaderboard.slice(0, 5)} currentUserId={user?.id} />
+            <LeaderboardTable
+              entries={leaderboard.slice(0, 5)}
+              currentUserId={user?.id}
+            />
           </CardContent>
         </Card>
 
@@ -178,9 +183,7 @@ export default function QuizPlayPage() {
               Question {questionIndex + 1} of {totalQuestions}
             </p>
           </div>
-          {questionEndTime && (
-            <CountdownTimer endTime={questionEndTime} />
-          )}
+          {questionEndTime && <CountdownTimer endTime={questionEndTime} />}
         </div>
 
         <Progress
@@ -190,7 +193,9 @@ export default function QuizPlayPage() {
 
         <Card>
           <CardContent className="py-6">
-            <p className="text-xl font-medium">{currentQuestion.questionText}</p>
+            <p className="text-xl font-medium">
+              {currentQuestion.questionText}
+            </p>
           </CardContent>
         </Card>
 
@@ -199,7 +204,11 @@ export default function QuizPlayPage() {
             <OptionButton
               key={option}
               option={option}
-              text={currentQuestion[`option${option}` as keyof typeof currentQuestion] as string}
+              text={
+                currentQuestion[
+                  `option${option}` as keyof typeof currentQuestion
+                ] as string
+              }
               isSelected={selectedOption === option}
               isCorrect={getOptionResult(option)}
               isDisabled={hasAnswered || isSubmitting}

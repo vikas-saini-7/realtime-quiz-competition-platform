@@ -47,7 +47,7 @@ export function CountdownTimer({
         <div
           className={cn(
             "relative flex items-center justify-center w-20 h-20 rounded-full border-4 transition-colors",
-            isLow ? "border-red-500" : "border-primary"
+            isLow ? "border-red-500" : "border-primary",
           )}
         >
           <svg className="absolute inset-0 w-full h-full -rotate-90">
@@ -61,14 +61,14 @@ export function CountdownTimer({
               strokeDasharray={`${(percentage / 100) * 226} 226`}
               className={cn(
                 "transition-all duration-100",
-                isLow ? "text-red-500" : "text-primary"
+                isLow ? "text-red-500" : "text-primary",
               )}
             />
           </svg>
           <span
             className={cn(
               "text-2xl font-bold tabular-nums",
-              isLow && "text-red-500 animate-pulse"
+              isLow && "text-red-500 animate-pulse",
             )}
           >
             {timeLeft}

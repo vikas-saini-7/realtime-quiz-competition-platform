@@ -32,7 +32,8 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto py-4">
         <nav className="space-y-1 px-3">
           {sidebarItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            const isActive =
+              pathname === item.href || pathname.startsWith(item.href + "/");
             return (
               <Link
                 key={item.href}
@@ -41,7 +42,7 @@ export function Sidebar() {
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   isActive
                     ? "bg-secondary text-secondary-foreground"
-                    : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                    : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
                 )}
               >
                 <item.icon className="h-5 w-5" />

@@ -31,9 +31,7 @@ export function QRCodeDisplay({ quizId, title }: QRCodeDisplayProps) {
   return (
     <Card className="w-fit">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg">
-          {title || "Scan to Join"}
-        </CardTitle>
+        <CardTitle className="text-lg">{title || "Scan to Join"}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
         <div className="p-4 bg-white rounded-lg">

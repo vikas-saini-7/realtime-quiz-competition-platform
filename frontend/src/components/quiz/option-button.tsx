@@ -14,11 +14,22 @@ interface OptionButtonProps {
   onClick: () => void;
 }
 
-const optionColors: Record<OptionLetter, { bg: string; border: string; text: string }> = {
+const optionColors: Record<
+  OptionLetter,
+  { bg: string; border: string; text: string }
+> = {
   A: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700" },
   B: { bg: "bg-green-50", border: "border-green-200", text: "text-green-700" },
-  C: { bg: "bg-yellow-50", border: "border-yellow-200", text: "text-yellow-700" },
-  D: { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-700" },
+  C: {
+    bg: "bg-yellow-50",
+    border: "border-yellow-200",
+    text: "text-yellow-700",
+  },
+  D: {
+    bg: "bg-purple-50",
+    border: "border-purple-200",
+    text: "text-purple-700",
+  },
 };
 
 export function OptionButton({
@@ -49,14 +60,14 @@ export function OptionButton({
         "hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50",
         isSelected && !showResult && "ring-2 ring-primary ring-offset-2",
         !isSelected && !showResult && colors.border,
-        getResultStyles()
+        getResultStyles(),
       )}
     >
       <span
         className={cn(
           "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg",
           colors.bg,
-          colors.text
+          colors.text,
         )}
       >
         {option}

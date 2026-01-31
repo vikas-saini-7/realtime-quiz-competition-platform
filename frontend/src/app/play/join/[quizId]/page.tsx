@@ -3,9 +3,19 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { IconArrowLeft, IconLoader2, IconPlayerPlay } from "@tabler/icons-react";
+import {
+  IconArrowLeft,
+  IconLoader2,
+  IconPlayerPlay,
+} from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuizStatusBadge } from "@/components/quiz";
 import { useQuiz } from "@/hooks";
@@ -72,7 +82,9 @@ export default function JoinQuizPage() {
         <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
           <QuizStatusBadge status={quiz.status} />
           <h2 className="text-xl font-semibold">{quiz.title}</h2>
-          <p className="text-muted-foreground">This quiz is not currently live</p>
+          <p className="text-muted-foreground">
+            This quiz is not currently live
+          </p>
           <Button asChild>
             <Link href="/play/browse">Browse Other Quizzes</Link>
           </Button>

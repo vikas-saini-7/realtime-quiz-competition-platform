@@ -56,7 +56,7 @@ export default function LoginPage() {
       setAccessToken(response.accessToken);
       setAuth(response.user, response.accessToken);
       toast.success("Welcome back!");
-      
+
       // Redirect based on role
       if (response.user.role === "HOST") {
         router.push("/host/dashboard");
@@ -64,7 +64,8 @@ export default function LoginPage() {
         router.push("/play/browse");
       }
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Invalid credentials";
+      const message =
+        error instanceof Error ? error.message : "Invalid credentials";
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -125,7 +126,9 @@ export default function LoginPage() {
               )}
             />
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading && (
+                <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Sign In
             </Button>
           </form>
