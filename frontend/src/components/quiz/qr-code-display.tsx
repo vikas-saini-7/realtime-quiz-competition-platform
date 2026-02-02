@@ -7,15 +7,15 @@ import { IconCopy, IconCheck } from "@tabler/icons-react";
 import { useState } from "react";
 
 interface QRCodeDisplayProps {
-  quizId: string;
+  quizCode: string;
   title?: string;
 }
 
-export function QRCodeDisplay({ quizId, title }: QRCodeDisplayProps) {
+export function QRCodeDisplay({ quizCode, title }: QRCodeDisplayProps) {
   const [copied, setCopied] = useState(false);
   const joinUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/play/join/${quizId}`
+      ? `${window.location.origin}/join/${quizCode}`
       : "";
 
   const handleCopy = async () => {

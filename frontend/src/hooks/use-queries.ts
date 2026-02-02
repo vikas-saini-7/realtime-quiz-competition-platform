@@ -57,6 +57,14 @@ export function useQuiz(quizId: string) {
   });
 }
 
+export function useQuizByCode(code: string) {
+  return useQuery({
+    queryKey: ["quiz", "code", code],
+    queryFn: () => quizService.getByCode(code),
+    enabled: !!code,
+  });
+}
+
 export function useQuizWithQuestions(quizId: string) {
   return useQuery({
     queryKey: ["quiz", quizId, "questions"],

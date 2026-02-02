@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useEffect } from "react";
 import { IconLoader2 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import type { Question } from "@/types";
 
 const questionSchema = z.object({
   questionText: z.string().min(1, "Question is required"),
@@ -51,6 +53,8 @@ interface AddQuestionModalProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: QuestionFormValues) => Promise<void>;
   isSubmitting: boolean;
+  question?: Question; // Optional: if provided, modal is in edit mode
+  mode?: "create" | "edit";
 }
 
 export function AddQuestionModal({
@@ -58,7 +62,11 @@ export function AddQuestionModal({
   onOpenChange,
   onSubmit,
   isSubmitting,
+  question,
+  mode = "create",
 }: AddQuestionModalProps) {
+  const isEditMode = mode === "edit" || !!question;
+
   const form = useForm<QuestionFormValues>({
     resolver: zodResolver(questionSchema),
     defaultValues: {
@@ -74,14 +82,50 @@ export function AddQuestionModal({
     },
   });
 
+  // Update form when question changes (for edit mode)
+  useEffect(() => {
+    if (question && open) {
+      form.reset({
+        questionText: question.questionText,
+        optionA: question.optionA,
+        optionB: question.optionB,
+        optionC: question.optionC,
+        optionD: question.optionD,
+        correctOption: question.correctOption,
+        timeLimit: question.timeLimit,
+        baseScore: question.baseScore,
+        negativeScore: question.negativeScore,
+      });
+    } else if (!open) {
+      // Reset form when modal closes
+      form.reset({
+        questionText: "",
+        optionA: "",
+        optionB: "",
+        optionC: "",
+        optionD: "",
+        correctOption: "A",
+        timeLimit: 30,
+        baseScore: 100,
+        negativeScore: 25,
+      });
+    }
+  }, [question, open, form]);
+
   const handleSubmit = async (data: QuestionFormValues) => {
     try {
       await onSubmit(data);
       form.reset();
       onOpenChange(false);
-      toast.success("Question added successfully!");
+      toast.success(
+        isEditMode
+          ? "Question updated successfully!"
+          : "Question added successfully!",
+      );
     } catch {
-      toast.error("Failed to add question");
+      toast.error(
+        isEditMode ? "Failed to update question" : "Failed to add question",
+      );
     }
   };
 
@@ -90,7 +134,7 @@ export function AddQuestionModal({
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto rounded-3xl">
         <DialogHeader className="space-y-3">
           <DialogTitle className="text-2xl font-bold">
-            Add New Question
+            {isEditMode ? "Edit Question" : "Add New Question"}
           </DialogTitle>
           {/* <DialogDescription className="text-base">
             Create a new question for your quiz
@@ -271,7 +315,7 @@ export function AddQuestionModal({
                 {isSubmitting && (
                   <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Add Question
+                {isEditMode ? "Update Question" : "Add Question"}
               </Button>
             </DialogFooter>
           </form>

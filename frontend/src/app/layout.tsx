@@ -20,7 +20,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-sans antialiased h-screen overflow-hidden">
+      <body className="font-sans antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

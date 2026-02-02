@@ -119,6 +119,13 @@ export const quizService = {
     return response.data.data;
   },
 
+  getByCode: async (code: string): Promise<Quiz> => {
+    const response = await api.get<{ success: boolean; data: Quiz }>(
+      `/quizzes/code/${code}`,
+    );
+    return response.data.data;
+  },
+
   getWithQuestions: async (id: string): Promise<QuizWithQuestions> => {
     const response = await api.get<{
       success: boolean;

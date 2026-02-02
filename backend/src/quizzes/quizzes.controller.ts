@@ -40,6 +40,15 @@ export class QuizzesController {
     return this.quizzesService.findLiveQuizzes();
   }
 
+  @Get('code/:code')
+  async findByCode(@Param('code') code: string) {
+    const quiz = await this.quizzesService.findByCode(code);
+    if (!quiz) {
+      throw new NotFoundException('Quiz not found');
+    }
+    return quiz;
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const quiz = await this.quizzesService.findById(id);

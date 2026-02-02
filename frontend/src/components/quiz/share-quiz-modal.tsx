@@ -28,7 +28,7 @@ export function ShareQuizModal({
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  const joinUrl = `${window.location.origin}/play/join/${quiz.code}`;
+  const joinUrl = `${window.location.origin}/join/${quiz.code}`;
 
   const handleCopyCode = async () => {
     try {

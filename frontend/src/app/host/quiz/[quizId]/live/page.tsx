@@ -300,7 +300,9 @@ export default function LiveQuizPage() {
 
         {/* Right: QR Code & Leaderboard */}
         <div className="space-y-6">
-          {status === "waiting" && <QRCodeDisplay quizId={quizId} />}
+          {status === "waiting" && quiz?.code && (
+            <QRCodeDisplay quizCode={quiz.code} />
+          )}
 
           <Card>
             <CardHeader>

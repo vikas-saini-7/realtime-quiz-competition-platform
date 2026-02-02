@@ -98,17 +98,16 @@ type QuestionFormValues = z.infer<typeof questionSchema>;
 function QuestionCard({
   question,
   index,
-  onUpdate,
+  onEdit,
   onDelete,
   isUpdating,
 }: {
   question: Question;
   index: number;
-  onUpdate: (data: QuestionFormValues) => void;
+  onEdit: () => void;
   onDelete: () => void;
   isUpdating: boolean;
 }) {
-  const [isEditing, setIsEditing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const {
@@ -124,26 +123,6 @@ function QuestionCard({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-  };
-
-  const form = useForm<QuestionFormValues>({
-    resolver: zodResolver(questionSchema),
-    defaultValues: {
-      questionText: question.questionText,
-      optionA: question.optionA,
-      optionB: question.optionB,
-      optionC: question.optionC,
-      optionD: question.optionD,
-      correctOption: question.correctOption,
-      timeLimit: question.timeLimit,
-      baseScore: question.baseScore,
-      negativeScore: question.negativeScore,
-    },
-  });
-
-  const handleSave = async (data: QuestionFormValues) => {
-    await onUpdate(data);
-    setIsEditing(false);
   };
 
   return (
@@ -195,13 +174,9 @@ function QuestionCard({
                 variant="ghost"
                 size="sm"
                 className="h-8 w-8 p-0 rounded-lg"
-                onClick={() => setIsEditing(!isEditing)}
+                onClick={onEdit}
               >
-                {isEditing ? (
-                  <IconCheck className="h-4 w-4" />
-                ) : (
-                  <IconEdit className="h-4 w-4" />
-                )}
+                <IconEdit className="h-4 w-4" />
               </Button>
               <Button
                 type="button"
@@ -230,185 +205,45 @@ function QuestionCard({
         </CardHeader>
         <CollapsibleContent>
           <CardContent className="pt-4 px-5 pb-5">
-            {isEditing ? (
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(handleSave)}
-                  className="space-y-4"
-                >
-                  <FormField
-                    control={form.control}
-                    name="questionText"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Question</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Enter your question..."
-                            className="resize-none min-h-[80px]"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {(["A", "B", "C", "D"] as const).map((option) => (
-                      <FormField
-                        key={option}
-                        control={form.control}
-                        name={`option${option}` as keyof QuestionFormValues}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Option {option}</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder={`Option ${option}`}
-                                {...field}
-                                value={field.value as string}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="correctOption"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Correct Answer</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="A">A</SelectItem>
-                              <SelectItem value="B">B</SelectItem>
-                              <SelectItem value="C">C</SelectItem>
-                              <SelectItem value="D">D</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="timeLimit"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Time (sec)</FormLabel>
-                          <FormControl>
-                            <Input type="number" min={5} max={120} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="baseScore"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Base Score</FormLabel>
-                          <FormControl>
-                            <Input type="number" min={0} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="negativeScore"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Negative</FormLabel>
-                          <FormControl>
-                            <Input type="number" min={0} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button type="submit" disabled={isUpdating}>
-                      {isUpdating && (
-                        <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      Save Changes
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        setIsEditing(false);
-                        form.reset();
-                      }}
+            <div className="space-y-5">
+              <div>
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                  Question
+                </h4>
+                <p className="text-base text-foreground leading-relaxed">
+                  {question.questionText}
+                </p>
+              </div>
+              <div>
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                  Options
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {(["A", "B", "C", "D"] as const).map((option) => (
+                    <div
+                      key={option}
+                      className={`p-3.5 rounded-xl border transition-colors ${
+                        question.correctOption === option
+                          ? "border-green-500/50 bg-green-50 dark:bg-green-950/30"
+                          : "border-border hover:border-border/80"
+                      }`}
                     >
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            ) : (
-              <div className="space-y-5">
-                <div>
-                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                    Question
-                  </h4>
-                  <p className="text-base text-foreground leading-relaxed">
-                    {question.questionText}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                    Options
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {(["A", "B", "C", "D"] as const).map((option) => (
-                      <div
-                        key={option}
-                        className={`p-3.5 rounded-xl border transition-colors ${
-                          question.correctOption === option
-                            ? "border-green-500/50 bg-green-50 dark:bg-green-950/30"
-                            : "border-border hover:border-border/80"
-                        }`}
-                      >
-                        <div className="flex items-start gap-2.5">
-                          <span className="font-semibold text-sm text-muted-foreground min-w-[20px]">
-                            {option}.
-                          </span>
-                          <span className="flex-1 text-sm">
-                            {question[`option${option}`]}
-                          </span>
-                          {question.correctOption === option && (
-                            <IconCheck className="h-4 w-4 text-green-600 shrink-0" />
-                          )}
-                        </div>
+                      <div className="flex items-start gap-2.5">
+                        <span className="font-semibold text-sm text-muted-foreground min-w-[20px]">
+                          {option}.
+                        </span>
+                        <span className="flex-1 text-sm">
+                          {question[`option${option}`]}
+                        </span>
+                        {question.correctOption === option && (
+                          <IconCheck className="h-4 w-4 text-green-600 shrink-0" />
+                        )}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
+            </div>
           </CardContent>
         </CollapsibleContent>
       </Card>
@@ -429,6 +264,8 @@ export default function EditQuizPage() {
 
   const [editingQuizDetails, setEditingQuizDetails] = useState(false);
   const [addQuestionModalOpen, setAddQuestionModalOpen] = useState(false);
+  const [editQuestionModalOpen, setEditQuestionModalOpen] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
   const sensors = useSensors(
@@ -512,6 +349,18 @@ export default function EditQuizPage() {
     } catch {
       toast.error("Failed to update question");
     }
+  };
+
+  const handleEditQuestionClick = (question: Question) => {
+    setEditingQuestion(question);
+    setEditQuestionModalOpen(true);
+  };
+
+  const handleEditQuestionSubmit = async (data: QuestionFormValues) => {
+    if (!editingQuestion) return;
+    await handleUpdateQuestion(editingQuestion.id, data);
+    setEditQuestionModalOpen(false);
+    setEditingQuestion(null);
   };
 
   const handleDeleteQuestion = async (questionId: string) => {
@@ -629,9 +478,7 @@ export default function EditQuizPage() {
                       key={question.id}
                       question={question}
                       index={index}
-                      onUpdate={(data) =>
-                        handleUpdateQuestion(question.id, data)
-                      }
+                      onEdit={() => handleEditQuestionClick(question)}
                       onDelete={() => handleDeleteQuestion(question.id)}
                       isUpdating={updateQuestion.isPending}
                     />
@@ -666,6 +513,18 @@ export default function EditQuizPage() {
         onOpenChange={setAddQuestionModalOpen}
         onSubmit={handleAddQuestion}
         isSubmitting={createQuestion.isPending}
+      />
+
+      <AddQuestionModal
+        open={editQuestionModalOpen}
+        onOpenChange={(open) => {
+          setEditQuestionModalOpen(open);
+          if (!open) setEditingQuestion(null);
+        }}
+        onSubmit={handleEditQuestionSubmit}
+        isSubmitting={updateQuestion.isPending}
+        question={editingQuestion || undefined}
+        mode="edit"
       />
 
       <ShareQuizModal

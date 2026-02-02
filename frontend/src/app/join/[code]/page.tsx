@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -18,21 +18,20 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuizStatusBadge } from "@/components/quiz";
-import { useQuiz } from "@/hooks";
+import { useQuizByCode } from "@/hooks";
 import { useSocket, useParticipantActions } from "@/hooks/use-socket";
-import { useQuizStore, useAuthStore } from "@/store";
+import { useAuthStore } from "@/store";
 import { toast } from "sonner";
 
-export default function JoinQuizPage() {
+export default function JoinQuizConfirmPage() {
   const params = useParams();
   const router = useRouter();
-  const quizId = params.quizId as string;
+  const quizCode = params.code as string;
 
-  const { data: quiz, isLoading } = useQuiz(quizId);
+  const { data: quiz, isLoading } = useQuizByCode(quizCode);
   const { isConnected } = useSocket();
   const { join } = useParticipantActions();
   const { user } = useAuthStore();
-  const { status } = useQuizStore();
 
   const [isJoining, setIsJoining] = useState(false);
 
@@ -42,11 +41,16 @@ export default function JoinQuizPage() {
       return;
     }
 
+    if (!quiz?.id) {
+      toast.error("Quiz not found");
+      return;
+    }
+
     setIsJoining(true);
     try {
-      await join(quizId);
+      await join(quiz.id);
       toast.success("Joined quiz!");
-      router.push(`/play/lobby/${quizId}`);
+      router.push(`/quiz/${quiz.code}`);
     } catch (error) {
       toast.error("Failed to join quiz");
       console.error(error);
@@ -66,10 +70,11 @@ export default function JoinQuizPage() {
   if (!quiz) {
     return (
       <div className="container py-8">
-        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <div className="flex flex-col items-center justify-center min-h-100 gap-4">
           <p className="text-muted-foreground">Quiz not found</p>
+          <p className="text-sm text-muted-foreground">Code: {quizCode}</p>
           <Button asChild>
-            <Link href="/play/browse">Browse Quizzes</Link>
+            <Link href="/join">Try Another Code</Link>
           </Button>
         </div>
       </div>
@@ -79,14 +84,14 @@ export default function JoinQuizPage() {
   if (quiz.status !== "LIVE") {
     return (
       <div className="container py-8">
-        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <div className="flex flex-col items-center justify-center min-h-100 gap-4">
           <QuizStatusBadge status={quiz.status} />
           <h2 className="text-xl font-semibold">{quiz.title}</h2>
           <p className="text-muted-foreground">
             This quiz is not currently live
           </p>
           <Button asChild>
-            <Link href="/play/browse">Browse Other Quizzes</Link>
+            <Link href="/join">Try Another Code</Link>
           </Button>
         </div>
       </div>
@@ -97,7 +102,7 @@ export default function JoinQuizPage() {
     <div className="container py-8 max-w-lg mx-auto">
       <div className="flex items-center gap-4 mb-6">
         <Button variant="ghost" size="icon" asChild>
-          <Link href="/play/browse">
+          <Link href="/join">
             <IconArrowLeft className="h-5 w-5" />
           </Link>
         </Button>
@@ -116,6 +121,10 @@ export default function JoinQuizPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Quiz Code:</span>
+              <span className="font-mono font-bold">{quiz.code}</span>
+            </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Joining as:</span>
               <span className="font-medium">{user?.name || "Guest"}</span>

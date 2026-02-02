@@ -5,6 +5,7 @@ export {
   useMyQuizzes,
   useLiveQuizzes,
   useQuiz,
+  useQuizByCode,
   useQuizWithQuestions,
   useCreateQuiz,
   useUpdateQuiz,

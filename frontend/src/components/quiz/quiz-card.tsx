@@ -139,7 +139,7 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
           </>
         ) : (
           <Button asChild className="w-full" disabled={quiz.status !== "LIVE"}>
-            <Link href={`/play/join/${quiz.id}`}>
+            <Link href={`/play/join/${quiz.code}`}>
               <IconPlayerPlay className="h-4 w-4 mr-2" />
               {quiz.status === "LIVE" ? "Join Quiz" : "Not Available"}
             </Link>

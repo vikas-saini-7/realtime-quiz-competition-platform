@@ -91,6 +91,15 @@ export class QuizzesService {
     return result[0] || null;
   }
 
+  async findByCode(code: string): Promise<Quiz | null> {
+    const result = await this.db
+      .select()
+      .from(quizzes)
+      .where(eq(quizzes.code, code))
+      .limit(1);
+    return result[0] || null;
+  }
+
   async findByIdWithQuestions(id: string) {
     const quiz = await this.findById(id);
     if (!quiz) {
