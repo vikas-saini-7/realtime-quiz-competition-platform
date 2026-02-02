@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import type {
+  ApiResponse,
   AuthResponse,
   LoginCredentials,
   RegisterCredentials,
@@ -76,52 +77,70 @@ export const authService = {
 
   login: async (data: LoginCredentials): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>("/auth/login", data);
+    // console.log("API login response:", response.data);
     return response.data;
   },
 
   getMe: async (): Promise<User> => {
-    const response = await api.get<User>("/auth/me");
-    return response.data;
+    const response = await api.get<{ success: boolean; data: User }>(
+      "/auth/me",
+    );
+    return response.data.data;
   },
 };
 
 // Quiz Service
 export const quizService = {
   getAll: async (): Promise<Quiz[]> => {
-    const response = await api.get<Quiz[]>("/quizzes");
-    return response.data;
+    const response = await api.get<{ success: boolean; data: Quiz[] }>(
+      "/quizzes",
+    );
+    return response.data.data;
   },
 
   getMyQuizzes: async (): Promise<Quiz[]> => {
-    const response = await api.get<Quiz[]>("/quizzes/my-quizzes");
-    return response.data;
+    const response = await api.get<{ success: boolean; data: Quiz[] }>(
+      "/quizzes/my-quizzes",
+    );
+    return response.data.data;
   },
 
   getLive: async (): Promise<Quiz[]> => {
-    const response = await api.get<Quiz[]>("/quizzes/live");
-    return response.data;
+    const response = await api.get<{ success: boolean; data: Quiz[] }>(
+      "/quizzes/live",
+    );
+    return response.data.data;
   },
 
   getById: async (id: string): Promise<Quiz> => {
-    const response = await api.get<Quiz>(`/quizzes/${id}`);
-    return response.data;
+    const response = await api.get<{ success: boolean; data: Quiz }>(
+      `/quizzes/${id}`,
+    );
+    return response.data.data;
   },
 
   getWithQuestions: async (id: string): Promise<QuizWithQuestions> => {
-    const response = await api.get<QuizWithQuestions>(
-      `/quizzes/${id}/with-questions`,
-    );
-    return response.data;
+    const response = await api.get<{
+      success: boolean;
+      data: QuizWithQuestions;
+    }>(`/quizzes/${id}/with-questions`);
+    return response.data.data;
   },
 
   create: async (data: CreateQuizDto): Promise<Quiz> => {
-    const response = await api.post<Quiz>("/quizzes", data);
-    return response.data;
+    const response = await api.post<{ success: boolean; data: Quiz }>(
+      "/quizzes",
+      data,
+    );
+    return response.data.data;
   },
 
   update: async (id: string, data: UpdateQuizDto): Promise<Quiz> => {
-    const response = await api.put<Quiz>(`/quizzes/${id}`, data);
-    return response.data;
+    const response = await api.put<{ success: boolean; data: Quiz }>(
+      `/quizzes/${id}`,
+      data,
+    );
+    return response.data.data;
   },
 
   delete: async (id: string): Promise<void> => {
@@ -132,28 +151,41 @@ export const quizService = {
 // Question Service
 export const questionService = {
   getByQuizId: async (quizId: string): Promise<Question[]> => {
-    const response = await api.get<Question[]>(`/questions/quiz/${quizId}`);
-    return response.data;
+    const response = await api.get<{ success: boolean; data: Question[] }>(
+      `/questions/quiz/${quizId}`,
+    );
+    return response.data.data;
   },
 
   getById: async (id: string): Promise<Question> => {
-    const response = await api.get<Question>(`/questions/${id}`);
-    return response.data;
+    const response = await api.get<{ success: boolean; data: Question }>(
+      `/questions/${id}`,
+    );
+    return response.data.data;
   },
 
   create: async (data: CreateQuestionDto): Promise<Question> => {
-    const response = await api.post<Question>("/questions", data);
-    return response.data;
+    const response = await api.post<{ success: boolean; data: Question }>(
+      "/questions",
+      data,
+    );
+    return response.data.data;
   },
 
   bulkCreate: async (data: BulkCreateQuestionsDto): Promise<Question[]> => {
-    const response = await api.post<Question[]>("/questions/bulk", data);
-    return response.data;
+    const response = await api.post<{ success: boolean; data: Question[] }>(
+      "/questions/bulk",
+      data,
+    );
+    return response.data.data;
   },
 
   update: async (id: string, data: UpdateQuestionDto): Promise<Question> => {
-    const response = await api.put<Question>(`/questions/${id}`, data);
-    return response.data;
+    const response = await api.put<{ success: boolean; data: Question }>(
+      `/questions/${id}`,
+      data,
+    );
+    return response.data.data;
   },
 
   delete: async (id: string): Promise<void> => {
@@ -164,36 +196,49 @@ export const questionService = {
 // Attempt Service
 export const attemptService = {
   create: async (quizId: string): Promise<Attempt> => {
-    const response = await api.post<Attempt>("/attempts", { quizId });
-    return response.data;
+    const response = await api.post<{ success: boolean; data: Attempt }>(
+      "/attempts",
+      { quizId },
+    );
+    return response.data.data;
   },
 
   getMyAttempts: async (): Promise<Attempt[]> => {
-    const response = await api.get<Attempt[]>("/attempts/my-attempts");
-    return response.data;
+    const response = await api.get<{ success: boolean; data: Attempt[] }>(
+      "/attempts/my-attempts",
+    );
+    return response.data.data;
   },
 
   getByQuizId: async (quizId: string): Promise<Attempt[]> => {
-    const response = await api.get<Attempt[]>(`/attempts/quiz/${quizId}`);
-    return response.data;
+    const response = await api.get<{ success: boolean; data: Attempt[] }>(
+      `/attempts/quiz/${quizId}`,
+    );
+    return response.data.data;
   },
 
   getById: async (id: string): Promise<Attempt> => {
-    const response = await api.get<Attempt>(`/attempts/${id}`);
-    return response.data;
+    const response = await api.get<{ success: boolean; data: Attempt }>(
+      `/attempts/${id}`,
+    );
+    return response.data.data;
   },
 };
 
 // Answer Service
 export const answerService = {
   getByAttemptId: async (attemptId: string): Promise<Answer[]> => {
-    const response = await api.get<Answer[]>(`/answers/attempt/${attemptId}`);
-    return response.data;
+    const response = await api.get<{ success: boolean; data: Answer[] }>(
+      `/answers/attempt/${attemptId}`,
+    );
+    return response.data.data;
   },
 
   getById: async (id: string): Promise<Answer> => {
-    const response = await api.get<Answer>(`/answers/${id}`);
-    return response.data;
+    const response = await api.get<{ success: boolean; data: Answer }>(
+      `/answers/${id}`,
+    );
+    return response.data.data;
   },
 };
 
@@ -204,18 +249,19 @@ export const leaderboardService = {
     limit?: number,
   ): Promise<LeaderboardEntry[]> => {
     const params = limit ? { limit } : {};
-    const response = await api.get<LeaderboardEntry[]>(
-      `/leaderboard/${quizId}`,
-      { params },
-    );
-    return response.data;
+    const response = await api.get<{
+      success: boolean;
+      data: LeaderboardEntry[];
+    }>(`/leaderboard/${quizId}`, { params });
+    return response.data.data;
   },
 
   getMyPosition: async (quizId: string): Promise<LeaderboardEntry> => {
-    const response = await api.get<LeaderboardEntry>(
-      `/leaderboard/${quizId}/my-position`,
-    );
-    return response.data;
+    const response = await api.get<{
+      success: boolean;
+      data: LeaderboardEntry;
+    }>(`/leaderboard/${quizId}/my-position`);
+    return response.data.data;
   },
 };
 

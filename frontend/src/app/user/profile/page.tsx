@@ -8,7 +8,6 @@ import {
   IconShield,
 } from "@tabler/icons-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthStore } from "@/store";
@@ -51,9 +50,6 @@ export default function ProfilePage() {
             </div>
             <div>
               <h2 className="text-xl font-semibold">{user.name}</h2>
-              <Badge variant={user.role === "HOST" ? "default" : "secondary"}>
-                {user.role}
-              </Badge>
             </div>
           </div>
 
@@ -66,11 +62,7 @@ export default function ProfilePage() {
             </div>
             <div className="flex items-center gap-3">
               <IconShield className="h-5 w-5 text-muted-foreground" />
-              <span>
-                {user.role === "HOST"
-                  ? "Can create and host quizzes"
-                  : "Can participate in quizzes"}
-              </span>
+              <span>Can create, host, and participate in quizzes</span>
             </div>
             {user.createdAt && (
               <div className="flex items-center gap-3">

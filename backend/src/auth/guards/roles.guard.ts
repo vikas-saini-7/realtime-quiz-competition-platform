@@ -24,6 +24,7 @@ export class RolesGuard implements CanActivate {
       return false;
     }
 
-    return requiredRoles.includes(user.role);
+    // No role-based authorization - all authenticated users have access
+    return true;
   }
 }

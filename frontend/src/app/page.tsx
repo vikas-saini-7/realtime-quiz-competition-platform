@@ -95,10 +95,10 @@ export default function HomePage() {
             </p>
             <div className="flex gap-4">
               <Button asChild>
-                <Link href="/auth/register?role=HOST">Host a Quiz</Link>
+                <Link href="/auth/register">Create a Quiz</Link>
               </Button>
               <Button asChild variant="outline">
-                <Link href="/auth/register?role=USER">Join as Player</Link>
+                <Link href="/play/browse">Join a Quiz</Link>
               </Button>
             </div>
           </div>

@@ -12,8 +12,7 @@ import {
 import { QuestionsService } from './questions.service';
 import { CreateQuestionDto, UpdateQuestionDto, BulkCreateQuestionsDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles, CurrentUser } from '../common/decorators';
+import { CurrentUser } from '../common/decorators';
 import { User } from '../database/schema';
 
 @Controller('questions')
@@ -22,15 +21,11 @@ export class QuestionsController {
   constructor(private readonly questionsService: QuestionsService) {}
 
   @Post()
-  @UseGuards(RolesGuard)
-  @Roles('HOST')
   async create(@Body() createQuestionDto: CreateQuestionDto) {
     return this.questionsService.create(createQuestionDto);
   }
 
   @Post('bulk')
-  @UseGuards(RolesGuard)
-  @Roles('HOST')
   async createBulk(@Body() bulkCreateDto: BulkCreateQuestionsDto) {
     return this.questionsService.createBulk(
       bulkCreateDto.quizId,
@@ -53,8 +48,6 @@ export class QuestionsController {
   }
 
   @Put(':id')
-  @UseGuards(RolesGuard)
-  @Roles('HOST')
   async update(
     @Param('id') id: string,
     @Body() updateQuestionDto: UpdateQuestionDto,
@@ -64,8 +57,6 @@ export class QuestionsController {
   }
 
   @Delete(':id')
-  @UseGuards(RolesGuard)
-  @Roles('HOST')
   async remove(@Param('id') id: string, @CurrentUser() user: User) {
     await this.questionsService.delete(id, user.id);
     return { message: 'Question deleted successfully' };

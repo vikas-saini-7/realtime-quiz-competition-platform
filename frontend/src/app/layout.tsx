@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "QuizLive - Real-Time Quiz Competition Platform",
@@ -20,7 +14,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <head>
+        <link
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400,300&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="font-sans antialiased h-screen overflow-hidden">
         <Providers>{children}</Providers>
       </body>
     </html>

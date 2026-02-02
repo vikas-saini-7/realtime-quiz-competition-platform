@@ -113,8 +113,8 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { quizId: string },
   ) {
     const user = client.data.user;
-    if (user.role !== 'HOST') {
-      throw new WsException('Only hosts can initialize quizzes');
+    if (!user) {
+      throw new WsException('User not authenticated');
     }
 
     const quiz = await this.quizzesService.findById(data.quizId);
@@ -160,8 +160,8 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { quizId: string },
   ) {
     const user = client.data.user;
-    if (user.role !== 'HOST') {
-      throw new WsException('Only hosts can start quizzes');
+    if (!user) {
+      throw new WsException('User not authenticated');
     }
 
     const state = await this.quizStateService.getQuizState(data.quizId);
@@ -188,8 +188,8 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { quizId: string },
   ) {
     const user = client.data.user;
-    if (user.role !== 'HOST') {
-      throw new WsException('Only hosts can advance questions');
+    if (!user) {
+      throw new WsException('User not authenticated');
     }
 
     const state = await this.quizStateService.getQuizState(data.quizId);
@@ -260,8 +260,8 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { quizId: string },
   ) {
     const user = client.data.user;
-    if (user.role !== 'HOST') {
-      throw new WsException('Only hosts can end quizzes');
+    if (!user) {
+      throw new WsException('User not authenticated');
     }
 
     const state = await this.quizStateService.getQuizState(data.quizId);
@@ -282,6 +282,9 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { quizId: string },
   ) {
     const user = client.data.user;
+    if (!user) {
+      throw new WsException('User not authenticated');
+    }
 
     const quiz = await this.quizzesService.findById(data.quizId);
     if (!quiz) {
@@ -346,6 +349,9 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     },
   ) {
     const user = client.data.user;
+    if (!user) {
+      throw new WsException('User not authenticated');
+    }
 
     const state = await this.quizStateService.getQuizState(data.quizId);
     if (!state || state.status !== 'question') {
@@ -445,6 +451,9 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { quizId: string },
   ) {
     const user = client.data.user;
+    if (!user) {
+      throw new WsException('User not authenticated');
+    }
 
     await this.quizStateService.removeUserFromQuiz(data.quizId, user.id);
 

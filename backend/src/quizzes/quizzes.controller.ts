@@ -12,8 +12,7 @@ import {
 import { QuizzesService } from './quizzes.service';
 import { CreateQuizDto, UpdateQuizDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles, CurrentUser } from '../common/decorators';
+import { CurrentUser } from '../common/decorators';
 import { User } from '../database/schema';
 
 @Controller('quizzes')
@@ -22,8 +21,6 @@ export class QuizzesController {
   constructor(private readonly quizzesService: QuizzesService) {}
 
   @Post()
-  @UseGuards(RolesGuard)
-  @Roles('HOST')
   async create(@Body() createQuizDto: CreateQuizDto, @CurrentUser() user: User) {
     return this.quizzesService.create(createQuizDto, user.id);
   }
@@ -34,8 +31,6 @@ export class QuizzesController {
   }
 
   @Get('my-quizzes')
-  @UseGuards(RolesGuard)
-  @Roles('HOST')
   async findMyQuizzes(@CurrentUser() user: User) {
     return this.quizzesService.findByHost(user.id);
   }
@@ -64,8 +59,6 @@ export class QuizzesController {
   }
 
   @Put(':id')
-  @UseGuards(RolesGuard)
-  @Roles('HOST')
   async update(
     @Param('id') id: string,
     @Body() updateQuizDto: UpdateQuizDto,
@@ -75,8 +68,6 @@ export class QuizzesController {
   }
 
   @Delete(':id')
-  @UseGuards(RolesGuard)
-  @Roles('HOST')
   async remove(@Param('id') id: string, @CurrentUser() user: User) {
     await this.quizzesService.delete(id, user.id);
     return { message: 'Quiz deleted successfully' };

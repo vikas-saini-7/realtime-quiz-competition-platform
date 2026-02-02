@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -9,6 +10,7 @@ import {
   IconPlayerPlay,
   IconTrash,
   IconQuestionMark,
+  IconShare,
 } from "@tabler/icons-react";
 import {
   Card,
@@ -18,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ShareQuizModal } from "./share-quiz-modal";
 import type { Quiz, QuizStatus } from "@/types";
 
 interface QuizCardProps {
@@ -35,6 +38,7 @@ const statusColors: Record<QuizStatus, string> = {
 };
 
 export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   return (
     <Card className="flex flex-col h-full">
       <CardHeader className="pb-3">
@@ -118,6 +122,13 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
               </Button>
             )}
             <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShareModalOpen(true)}
+            >
+              <IconShare className="h-4 w-4" />
+            </Button>
+            <Button
               variant="ghost"
               size="sm"
               className="text-destructive hover:text-destructive"
@@ -135,6 +146,12 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
           </Button>
         )}
       </CardFooter>
+
+      <ShareQuizModal
+        open={shareModalOpen}
+        onOpenChange={setShareModalOpen}
+        quiz={quiz}
+      />
     </Card>
   );
 }

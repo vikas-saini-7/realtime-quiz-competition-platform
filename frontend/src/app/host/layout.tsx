@@ -7,11 +7,13 @@ export default function HostLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col bg-gray-500/10">
       <Header />
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+        <main className="flex-1 p-8 overflow-y-auto rounded-tl-xl bg-white">
+          {children}
+        </main>
       </div>
     </div>
   );

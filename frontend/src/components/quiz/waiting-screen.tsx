@@ -22,7 +22,7 @@ export function WaitingScreen({
       )}
     >
       <div className="relative">
-        <div className="w-24 h-24 rounded-full border-4 border-secondary animate-pulse" />
+        <div className="w-24 h-24 rounded-full border border-secondary animate-pulse" />
         <div className="absolute inset-0 flex items-center justify-center">
           <IconLoader2 className="h-10 w-10 text-primary animate-spin" />
         </div>

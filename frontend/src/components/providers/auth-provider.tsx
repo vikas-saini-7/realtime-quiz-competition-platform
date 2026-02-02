@@ -43,26 +43,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user &&
       ["/auth/login", "/auth/register"].includes(pathname)
     ) {
-      if (user.role === "HOST") {
-        router.replace("/host/dashboard");
-      } else {
-        router.replace("/play/browse");
-      }
+      router.replace("/host/dashboard");
       return;
     }
 
-    // Role-based access control
-    if (isAuthenticated && user) {
-      if (pathname.startsWith("/host") && user.role !== "HOST") {
-        router.replace("/play/browse");
-        return;
-      }
-      // Optionally, restrict /play to USERs only (if needed)
-      // if (pathname.startsWith("/play") && user.role !== "USER") {
-      //   router.replace("/host/dashboard");
-      //   return;
-      // }
-    }
+    // All authenticated users can access all routes
   }, [isAuthenticated, pathname, router, isHydrated, user]);
 
   // Show nothing while hydrating to prevent flash

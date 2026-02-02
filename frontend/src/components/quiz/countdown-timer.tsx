@@ -46,7 +46,7 @@ export function CountdownTimer({
       <div className="flex flex-col items-center justify-center">
         <div
           className={cn(
-            "relative flex items-center justify-center w-20 h-20 rounded-full border-4 transition-colors",
+            "relative flex items-center justify-center w-20 h-20 rounded-full border transition-colors",
             isLow ? "border-red-500" : "border-primary",
           )}
         >

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -35,25 +35,19 @@ import {
 import { authService, setAccessToken } from "@/lib/api";
 import { useAuthStore } from "@/store";
 import { toast } from "sonner";
-import type { UserRole } from "@/types";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["HOST", "USER"]),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { setAuth } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
-
-  const defaultRole = (searchParams.get("role")?.toUpperCase() ||
-    "USER") as UserRole;
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -61,7 +55,6 @@ export default function RegisterPage() {
       name: "",
       email: "",
       password: "",
-      role: defaultRole,
     },
   });
 
@@ -69,16 +62,12 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       const response = await authService.register(data);
-      setAccessToken(response.accessToken);
-      setAuth(response.user, response.accessToken);
+      setAccessToken(response.data.accessToken);
+      setAuth(response.data.user, response.data.accessToken);
       toast.success("Account created successfully!");
 
-      // Redirect based on role
-      if (response.user.role === "HOST") {
-        router.push("/host/dashboard");
-      } else {
-        router.push("/play/browse");
-      }
+      // Redirect to host dashboard (any user can create quizzes now)
+      router.push("/host/dashboard");
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Registration failed";
@@ -152,32 +141,6 @@ export default function RegisterPage() {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>I want to</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select your role" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="HOST">Host quizzes</SelectItem>
-                      <SelectItem value="USER">
-                        Participate in quizzes
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

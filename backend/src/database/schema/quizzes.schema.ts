@@ -25,6 +25,7 @@ export const quizzes = pgTable(
   'quizzes',
   {
     id: uuid('id').primaryKey().defaultRandom(),
+    code: varchar('code', { length: 10 }).notNull().unique(),
     title: varchar('title', { length: 255 }).notNull(),
     description: text('description'),
     hostId: uuid('host_id')
@@ -37,6 +38,7 @@ export const quizzes = pgTable(
   (table) => ({
     hostIdIdx: index('quizzes_host_id_idx').on(table.hostId),
     statusIdx: index('quizzes_status_idx').on(table.status),
+    codeIdx: index('quizzes_code_idx').on(table.code),
   }),
 );
 

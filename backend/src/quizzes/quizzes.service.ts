@@ -16,10 +16,48 @@ export class QuizzesService {
     private readonly db: Database,
   ) {}
 
+  private generateQuizCode(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 3; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    code += '-';
+    for (let i = 0; i < 3; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  private async generateUniqueQuizCode(): Promise<string> {
+    let code: string;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    do {
+      code = this.generateQuizCode();
+      const existing = await this.db
+        .select()
+        .from(quizzes)
+        .where(eq(quizzes.code, code))
+        .limit(1);
+
+      if (existing.length === 0) {
+        return code;
+      }
+      attempts++;
+    } while (attempts < maxAttempts);
+
+    throw new Error('Failed to generate unique quiz code');
+  }
+
   async create(createQuizDto: CreateQuizDto, hostId: string): Promise<Quiz> {
+    const code = await this.generateUniqueQuizCode();
+
     const result = await this.db
       .insert(quizzes)
       .values({
+        code,
         title: createQuizDto.title,
         description: createQuizDto.description,
         hostId,

@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconPlus, IconBrain } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuizCard } from "@/components/quiz/quiz-card";
+import { CreateQuizModal } from "@/components/quiz/create-quiz-modal";
 import { useMyQuizzes, useDeleteQuiz, useUpdateQuiz } from "@/hooks";
 import { toast } from "sonner";
 
@@ -13,6 +15,7 @@ export default function HostDashboardPage() {
   const { data: quizzes, isLoading, error } = useMyQuizzes();
   const deleteQuiz = useDeleteQuiz();
   const updateQuiz = useUpdateQuiz();
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this quiz?")) return;
@@ -44,30 +47,32 @@ export default function HostDashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">My Quizzes</h1>
-          <p className="text-muted-foreground">
-            Manage and host your quiz competitions
+          <h1 className="text-3xl font-bold tracking-tight">Quizzes</h1>
+          <p className="text-muted-foreground mt-1">
+            {quizzes?.length || 0} {quizzes?.length === 1 ? "quiz" : "quizzes"}
           </p>
         </div>
-        <Button onClick={() => router.push("/host/create-quiz")}>
+        <Button
+          onClick={() => setCreateModalOpen(true)}
+          size="lg"
+          className="rounded-xl"
+        >
           <IconPlus className="h-4 w-4 mr-2" />
-          Create Quiz
+          New Quiz
         </Button>
       </div>
 
       {isLoading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="space-y-4">
-              <Skeleton className="h-48 w-full" />
-            </div>
+            <Skeleton key={i} className="h-56 w-full rounded-2xl" />
           ))}
         </div>
       ) : quizzes && quizzes.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {quizzes.map((quiz) => (
             <QuizCard
               key={quiz.id}
@@ -79,18 +84,31 @@ export default function HostDashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 border rounded-lg bg-secondary/20">
-          <IconBrain className="h-16 w-16 text-muted-foreground" />
-          <h2 className="text-xl font-semibold">No quizzes yet</h2>
-          <p className="text-muted-foreground text-center max-w-md">
-            Create your first quiz to get started hosting live competitions.
-          </p>
-          <Button onClick={() => router.push("/host/create-quiz")}>
+        <div className="flex flex-col items-center justify-center min-h-[500px] gap-6 rounded-3xl border-2 border-dashed">
+          <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-muted">
+            <IconBrain className="h-10 w-10 text-muted-foreground" />
+          </div>
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-bold">Create your first quiz</h2>
+            <p className="text-muted-foreground max-w-sm">
+              Get started by creating a quiz and share it with your audience.
+            </p>
+          </div>
+          <Button
+            onClick={() => setCreateModalOpen(true)}
+            size="lg"
+            className="rounded-xl"
+          >
             <IconPlus className="h-4 w-4 mr-2" />
-            Create Your First Quiz
+            New Quiz
           </Button>
         </div>
       )}
+
+      <CreateQuizModal
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+      />
     </div>
   );
 }

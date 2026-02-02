@@ -56,8 +56,8 @@ export function OptionButton({
       onClick={onClick}
       disabled={isDisabled}
       className={cn(
-        "w-full flex items-center gap-4 p-4 rounded-lg border-2 transition-all text-left",
-        "hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50",
+        "w-full flex items-center gap-4 p-4 rounded-lg border transition-all text-left",
+        "disabled:cursor-not-allowed disabled:opacity-50",
         isSelected && !showResult && "ring-2 ring-primary ring-offset-2",
         !isSelected && !showResult && colors.border,
         getResultStyles(),

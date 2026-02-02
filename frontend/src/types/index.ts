@@ -1,17 +1,23 @@
-// User types
-export type UserRole = "HOST" | "USER";
+// API Response wrapper
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
 
+// User types
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: UserRole;
   createdAt?: string;
 }
 
 export interface AuthResponse {
-  accessToken: string;
-  user: User;
+  success: boolean;
+  data: {
+    accessToken: string;
+    user: User;
+  };
 }
 
 export interface LoginCredentials {
@@ -23,7 +29,6 @@ export interface RegisterCredentials {
   name: string;
   email: string;
   password: string;
-  role?: UserRole;
 }
 
 // Quiz types
@@ -31,6 +36,7 @@ export type QuizStatus = "DRAFT" | "SCHEDULED" | "LIVE" | "COMPLETED";
 
 export interface Quiz {
   id: string;
+  code: string;
   title: string;
   description: string | null;
   hostId: string;

@@ -53,16 +53,12 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const response = await authService.login(data);
-      setAccessToken(response.accessToken);
-      setAuth(response.user, response.accessToken);
+      setAccessToken(response.data.accessToken);
+      setAuth(response.data.user, response.data.accessToken);
       toast.success("Welcome back!");
 
-      // Redirect based on role
-      if (response.user.role === "HOST") {
-        router.push("/host/dashboard");
-      } else {
-        router.push("/play/browse");
-      }
+      // Redirect to host dashboard (any user can create quizzes now)
+      router.push("/host/dashboard");
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Invalid credentials";

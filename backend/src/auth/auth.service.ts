@@ -15,7 +15,7 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-    const { name, email, password, role } = registerDto;
+    const { name, email, password } = registerDto;
 
     // Check if user already exists
     const existingUser = await this.usersService.findByEmail(email);
@@ -31,7 +31,6 @@ export class AuthService {
       name,
       email,
       passwordHash,
-      role: role || 'USER',
     });
 
     // Generate token
@@ -43,7 +42,6 @@ export class AuthService {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role,
       },
     };
   }
@@ -72,7 +70,6 @@ export class AuthService {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role,
       },
     };
   }
@@ -94,7 +91,6 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      role: user.role,
     };
     return this.jwtService.sign(payload);
   }

@@ -108,7 +108,7 @@ export default function QuizPlayPage() {
         {/* Answer Result */}
         <Card
           className={cn(
-            "border-2",
+            "border",
             lastAnswerResult?.isCorrect ? "border-green-500" : "border-red-500",
           )}
         >

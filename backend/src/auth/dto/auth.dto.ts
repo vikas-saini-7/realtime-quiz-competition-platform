@@ -1,11 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  MinLength,
-  IsEnum,
-  IsOptional,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class RegisterDto {
   @IsString()
@@ -19,10 +12,6 @@ export class RegisterDto {
   @IsString()
   @MinLength(6)
   password: string;
-
-  @IsEnum(['HOST', 'USER'])
-  @IsOptional()
-  role?: 'HOST' | 'USER';
 }
 
 export class LoginDto {
@@ -41,6 +30,5 @@ export class AuthResponseDto {
     id: string;
     name: string;
     email: string;
-    role: string;
   };
 }
