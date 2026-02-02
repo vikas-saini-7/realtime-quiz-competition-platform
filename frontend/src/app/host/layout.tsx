@@ -7,7 +7,7 @@ export default function HostLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen flex-col dark:bg-secondary/30 bg-black/10">
+    <div className="flex h-screen flex-col dark:bg-secondary/30 bg-gray-500/10">
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
