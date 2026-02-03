@@ -9,11 +9,22 @@ import {
   IconPlayerSkipForward,
   IconPlayerStop,
   IconLoader2,
+  IconRefresh,
+  IconTrophy,
+  IconMedal,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CardSkeleton } from "@/components/ui/card-skeleton";
 import { Separator } from "@/components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   ParticipantCounter,
   QRCodeDisplay,
@@ -32,7 +43,7 @@ export default function LiveQuizPage() {
 
   const { data: quiz, isLoading } = useQuizWithQuestions(quizId);
   const { socket, isConnected } = useSocket();
-  const { initializeQuiz, startQuiz, nextQuestion, endQuizEarly } =
+  const { initializeQuiz, startQuiz, nextQuestion, endQuizEarly, resetQuiz } =
     useHostActions();
 
   const {
@@ -54,6 +65,7 @@ export default function LiveQuizPage() {
   const [isStarting, setIsStarting] = useState(false);
   const [isAdvancing, setIsAdvancing] = useState(false);
   const [isEnding, setIsEnding] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [isTimerActive, setIsTimerActive] = useState(false);
 
@@ -198,6 +210,25 @@ export default function LiveQuizPage() {
     }
   };
 
+  const handleResetQuiz = async () => {
+    if (
+      !confirm(
+        "Are you sure you want to reset the quiz? This will clear all participant scores, answers, and reset the quiz to the initial state. All participants will be notified.",
+      )
+    )
+      return;
+
+    setIsResetting(true);
+    try {
+      await resetQuiz(quizId);
+      toast.success("Quiz has been reset successfully");
+    } catch {
+      toast.error("Failed to reset quiz");
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -245,21 +276,47 @@ export default function LiveQuizPage() {
         </div>
         <div className="flex gap-2">
           {status === "finished" ? (
-            <Button asChild>
-              <Link href={`/host/quiz/${quizId}/results`}>View Results</Link>
-            </Button>
+            <>
+              <Button asChild>
+                <Link href={`/host/quiz/${quizId}/results`}>View Results</Link>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleResetQuiz}
+                disabled={isResetting}
+              >
+                {isResetting && (
+                  <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                <IconRefresh className="h-4 w-4 mr-2" />
+                Reset Quiz
+              </Button>
+            </>
           ) : (
-            <Button
-              variant="destructive"
-              onClick={handleEndQuiz}
-              disabled={isEnding || status === "idle"}
-            >
-              {isEnding && (
-                <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              <IconPlayerStop className="h-4 w-4 mr-2" />
-              End Quiz
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                onClick={handleResetQuiz}
+                disabled={isResetting || status === "idle"}
+              >
+                {isResetting && (
+                  <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                <IconRefresh className="h-4 w-4 mr-2" />
+                Reset Quiz
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleEndQuiz}
+                disabled={isEnding || status === "idle"}
+              >
+                {isEnding && (
+                  <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                <IconPlayerStop className="h-4 w-4 mr-2" />
+                End Quiz
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -369,54 +426,88 @@ export default function LiveQuizPage() {
                   </div>
 
                   {/* Real-time Scores */}
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                  <div className="space-y-2">
                     {questionScores.length === 0 ? (
                       <p className="text-center text-muted-foreground py-8">
                         Waiting for participants to answer...
                       </p>
                     ) : (
-                      questionScores
-                        .sort((a, b) => {
-                          // Sort by score (descending), then by time (ascending)
-                          if (b.score !== a.score) return b.score - a.score;
-                          return a.timeTaken - b.timeTaken;
-                        })
-                        .map((scoreEntry, index) => (
-                          <div
-                            key={scoreEntry.userId}
-                            className={`flex items-center gap-3 p-3 rounded-lg ${
-                              scoreEntry.isCorrect
-                                ? "bg-green-500/10 border border-green-500/20"
-                                : "bg-red-500/10 border border-red-500/20"
-                            }`}
-                          >
-                            <div
-                              className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${
-                                scoreEntry.isCorrect
-                                  ? "bg-green-500/20 text-green-700 dark:text-green-400"
-                                  : "bg-red-500/20 text-red-700 dark:text-red-400"
-                              }`}
-                            >
-                              {index + 1}
-                            </div>
-                            <div className="flex-1">
-                              <div className="font-medium">
-                                {scoreEntry.userName}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {(scoreEntry.timeTaken / 1000).toFixed(1)}s
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="font-bold text-lg">
-                                {scoreEntry.score}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {scoreEntry.isCorrect ? "✓ Correct" : "✗ Wrong"}
-                              </div>
-                            </div>
-                          </div>
-                        ))
+                      <div className="rounded-lg border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="w-16">Rank</TableHead>
+                              <TableHead>Player</TableHead>
+                              <TableHead className="text-right w-24">
+                                Score
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {questionScores
+                              .sort((a, b) => {
+                                // Sort by time taken (ascending) - first to answer appears at top
+                                return (a.timeTaken || 0) - (b.timeTaken || 0);
+                              })
+                              .map((scoreEntry, index) => {
+                                const rank = index + 1;
+                                const getRankIcon = () => {
+                                  if (rank === 1)
+                                    return (
+                                      <IconTrophy className="h-5 w-5 text-yellow-500" />
+                                    );
+                                  if (rank === 2)
+                                    return (
+                                      <IconMedal className="h-5 w-5 text-gray-400" />
+                                    );
+                                  if (rank === 3)
+                                    return (
+                                      <IconMedal className="h-5 w-5 text-amber-600" />
+                                    );
+                                  return (
+                                    <span className="text-muted-foreground font-medium">
+                                      {rank}
+                                    </span>
+                                  );
+                                };
+
+                                return (
+                                  <TableRow
+                                    key={scoreEntry.userId}
+                                    className={
+                                      scoreEntry.isCorrect
+                                        ? "bg-green-500/5"
+                                        : "bg-red-500/5"
+                                    }
+                                  >
+                                    <TableCell className="font-medium">
+                                      <div className="flex items-center justify-center">
+                                        {getRankIcon()}
+                                      </div>
+                                    </TableCell>
+                                    <TableCell>
+                                      <span className="font-medium">
+                                        {scoreEntry.userName}
+                                      </span>
+                                    </TableCell>
+                                    <TableCell className="text-right tabular-nums font-semibold">
+                                      <span
+                                        className={
+                                          scoreEntry.score > 0
+                                            ? "text-green-600 dark:text-green-400"
+                                            : "text-red-600 dark:text-red-400"
+                                        }
+                                      >
+                                        {scoreEntry.score > 0 ? "+" : ""}
+                                        {scoreEntry.score}
+                                      </span>
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                          </TableBody>
+                        </Table>
+                      </div>
                     )}
                   </div>
                 </div>

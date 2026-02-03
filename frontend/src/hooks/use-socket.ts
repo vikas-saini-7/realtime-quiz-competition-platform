@@ -113,6 +113,18 @@ export function useSocket() {
       endQuiz(data.finalLeaderboard);
     });
 
+    socket.on("quiz:reset", (data: { quizId: string; message: string }) => {
+      console.log("[Socket] Quiz reset event received:", data);
+      // Reset local state
+      reset();
+      setStatus("waiting");
+      // Show toast notification
+      if (typeof window !== "undefined") {
+        const { toast } = require("sonner");
+        toast.info(data.message);
+      }
+    });
+
     // Participant events
     socket.on("participant:joined", (data: ParticipantJoinedEvent) => {
       console.log("[Socket] Participant joined event received:", data);
@@ -140,13 +152,15 @@ export function useSocket() {
     // Real-time question answers (for host)
     socket.on("participant:answered", (data) => {
       console.log("[Socket] Participant answered:", data);
-      useQuizStore.getState().addQuestionScore({
-        userId: data.userId,
-        userName: data.userName,
-        score: data.scoreAwarded,
-        isCorrect: data.isCorrect,
-        timeTaken: data.timeTaken,
-      });
+      useQuizStore
+        .getState()
+        .addQuestionScore(
+          data.userId,
+          data.userName,
+          data.scoreAwarded,
+          data.isCorrect,
+          data.timeTaken,
+        );
     });
 
     // Leaderboard updates
@@ -314,11 +328,41 @@ export function useHostActions() {
     });
   }, []);
 
+  const resetQuiz = useCallback(
+    (quizId: string): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        if (!socket) {
+          reject(new Error("Socket not connected"));
+          return;
+        }
+
+        socket.emit(
+          "host:reset-quiz",
+          { quizId },
+          (response: { success: boolean; state: any }) => {
+            if (response.success) {
+              // Reset local store
+              reset();
+              setTotalQuestions(response.state.totalQuestions);
+              setStatus("waiting");
+              setParticipantCount(0);
+              resolve();
+            } else {
+              reject(new Error("Failed to reset quiz"));
+            }
+          },
+        );
+      });
+    },
+    [reset, setTotalQuestions, setStatus, setParticipantCount],
+  );
+
   return {
     initializeQuiz,
     startQuiz,
     nextQuestion,
     endQuizEarly,
+    resetQuiz,
   };
 }
 

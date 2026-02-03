@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, inArray } from 'drizzle-orm';
 import { DATABASE_CONNECTION, Database } from '../database';
-import { answers, Answer, NewAnswer } from '../database/schema';
+import { answers, Answer, NewAnswer, attempts } from '../database/schema';
 
 @Injectable()
 export class AnswersService {
@@ -48,5 +48,22 @@ export class AnswersService {
   async getAttemptScore(attemptId: string): Promise<number> {
     const attemptAnswers = await this.findByAttemptId(attemptId);
     return attemptAnswers.reduce((sum, answer) => sum + answer.scoreAwarded, 0);
+  }
+
+  async deleteByQuizId(quizId: string): Promise<void> {
+    // First get all attempt IDs for this quiz
+    const quizAttempts = await this.db
+      .select({ id: attempts.id })
+      .from(attempts)
+      .where(eq(attempts.quizId, quizId));
+
+    if (quizAttempts.length === 0) {
+      return; // No attempts, so no answers to delete
+    }
+
+    const attemptIds = quizAttempts.map((a) => a.id);
+
+    // Delete all answers for these attempts
+    await this.db.delete(answers).where(inArray(answers.attemptId, attemptIds));
   }
 }

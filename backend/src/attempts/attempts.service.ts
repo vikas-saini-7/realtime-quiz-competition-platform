@@ -93,6 +93,10 @@ export class AttemptsService {
     return result[0] || null;
   }
 
+  async deleteByQuizId(quizId: string): Promise<void> {
+    await this.db.delete(attempts).where(eq(attempts.quizId, quizId));
+  }
+
   async getOrCreateAttempt(userId: string, quizId: string): Promise<Attempt> {
     const existing = await this.findByUserAndQuiz(userId, quizId);
     if (existing) {

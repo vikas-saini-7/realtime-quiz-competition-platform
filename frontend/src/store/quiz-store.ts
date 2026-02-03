@@ -212,16 +212,27 @@ export const useQuizStore = create<QuizState>((set) => ({
 
   addQuestionScore: (userId, userName, score, isCorrect, timeTaken) =>
     set((state) => {
+      console.log("[QuizStore] addQuestionScore called:", {
+        userId,
+        userName,
+        score,
+        isCorrect,
+        timeTaken,
+      });
       // Check if user already answered
       const existing = state.questionScores.find((s) => s.userId === userId);
       if (existing) {
+        console.log("[QuizStore] User already answered, skipping");
         return state; // Don't add duplicate
       }
+      const newScores = [
+        ...state.questionScores,
+        { userId, userName, score, isCorrect, timeTaken },
+      ];
+      console.log("[QuizStore] New questionScores:", newScores);
       return {
-        questionScores: [
-          ...state.questionScores,
-          { userId, userName, score, isCorrect, timeTaken },
-        ],
+        ...state,
+        questionScores: newScores,
       };
     }),
 

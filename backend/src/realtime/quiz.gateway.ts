@@ -347,6 +347,54 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { success: true };
   }
 
+  @SubscribeMessage('host:reset-quiz')
+  async handleHostResetQuiz(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { quizId: string },
+  ) {
+    const user = client.data.user;
+    if (!user) {
+      throw new WsException('User not authenticated');
+    }
+
+    const state = await this.quizStateService.getQuizState(data.quizId);
+    if (!state || state.hostId !== user.id) {
+      throw new WsException('Quiz not found or unauthorized');
+    }
+
+    this.logger.log(`Host ${user.name} is resetting quiz ${data.quizId}`);
+
+    // Get question count for reinitialization
+    const questionCount = await this.questionsService.getQuestionCount(data.quizId);
+
+    // Clear all quiz-related data
+    await this.leaderboardService.clearLeaderboard(data.quizId);
+    await this.answersService.deleteByQuizId(data.quizId);
+    await this.attemptsService.deleteByQuizId(data.quizId);
+    await this.quizStateService.clearQuizState(data.quizId);
+
+    // Reinitialize quiz state
+    const newState = await this.quizStateService.initializeQuizState(
+      data.quizId,
+      user.id,
+      questionCount,
+    );
+
+    // Notify all participants that quiz has been reset
+    const roomName = this.getRoomName(data.quizId);
+    this.server.to(roomName).emit('quiz:reset', {
+      quizId: data.quizId,
+      message: 'Quiz has been reset by the host',
+    });
+
+    this.logger.log(`Quiz ${data.quizId} has been reset successfully`);
+
+    return {
+      success: true,
+      state: newState,
+    };
+  }
+
   // ==================== PARTICIPANT EVENTS ====================
 
   @SubscribeMessage('participant:join')
