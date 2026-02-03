@@ -18,6 +18,7 @@ import {
   IconChevronUp,
   IconShare,
   IconGripVertical,
+  IconEye,
 } from "@tabler/icons-react";
 import {
   DndContext,
@@ -66,8 +67,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { CardSkeleton } from "@/components/ui/card-skeleton";
 import { QuizStatusBadge } from "@/components/quiz/quiz-status-badge";
 import { AddQuestionModal } from "@/components/quiz/add-question-modal";
 import { ShareQuizModal } from "@/components/quiz/share-quiz-modal";
@@ -392,9 +393,9 @@ export default function EditQuizPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-64 w-full" />
+        <CardSkeleton className="h-10 w-64" showHeader={false} linesCount={1} />
+        <CardSkeleton className="h-48 w-full" />
+        <CardSkeleton className="h-64 w-full" />
       </div>
     );
   }
@@ -430,6 +431,12 @@ export default function EditQuizPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" asChild disabled={!quiz.questions?.length}>
+            <Link href={`/host/quiz/${quizId}/preview`}>
+              <IconEye className="h-4 w-4 mr-2" />
+              Preview
+            </Link>
+          </Button>
           <Button variant="outline" onClick={() => setShareModalOpen(true)}>
             <IconShare className="h-4 w-4 mr-2" />
             Share

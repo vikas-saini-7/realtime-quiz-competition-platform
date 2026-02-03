@@ -12,7 +12,7 @@ import {
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CardSkeleton } from "@/components/ui/card-skeleton";
 import { Separator } from "@/components/ui/separator";
 import {
   ParticipantCounter,
@@ -132,11 +132,11 @@ export default function LiveQuizPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-10 w-64" />
+        <CardSkeleton className="h-10 w-64" showHeader={false} linesCount={1} />
         <div className="grid gap-6 lg:grid-cols-3">
-          <Skeleton className="h-64" />
-          <Skeleton className="h-64" />
-          <Skeleton className="h-64" />
+          <CardSkeleton className="h-64" />
+          <CardSkeleton className="h-64" />
+          <CardSkeleton className="h-64" />
         </div>
       </div>
     );

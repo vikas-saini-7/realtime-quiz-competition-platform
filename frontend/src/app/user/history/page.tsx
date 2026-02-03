@@ -6,7 +6,7 @@ import { IconHistory, IconTrophy, IconExternalLink } from "@tabler/icons-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CardSkeleton } from "@/components/ui/card-skeleton";
 import {
   Table,
   TableBody,
@@ -49,9 +49,15 @@ export default function HistoryPage() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-16 w-full" />
+                <div key={i} className="flex gap-4 items-center p-2">
+                  <CardSkeleton
+                    className="border-0 shadow-none"
+                    showHeader={false}
+                    linesCount={1}
+                  />
+                </div>
               ))}
             </div>
           ) : attempts && attempts.length > 0 ? (

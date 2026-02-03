@@ -16,7 +16,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { QuizStatusBadge } from "@/components/quiz";
 import { useQuizByCode } from "@/hooks";
 import { useSocket, useParticipantActions } from "@/hooks/use-socket";
@@ -50,7 +50,7 @@ export default function JoinQuizConfirmPage() {
     try {
       await join(quiz.id);
       toast.success("Joined quiz!");
-      router.push(`/quiz/${quiz.code}`);
+      router.push(`/play/${quiz.code}`);
     } catch (error) {
       toast.error("Failed to join quiz");
       console.error(error);
@@ -62,7 +62,9 @@ export default function JoinQuizConfirmPage() {
   if (isLoading) {
     return (
       <div className="container py-8 max-w-lg mx-auto">
-        <Skeleton className="h-64" />
+        <Card className="h-64 flex items-center justify-center">
+          <LoadingSpinner size="lg" message="Loading quiz details..." />
+        </Card>
       </div>
     );
   }

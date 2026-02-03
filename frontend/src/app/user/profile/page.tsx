@@ -9,7 +9,8 @@ import {
 } from "@tabler/icons-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { CardSkeleton } from "@/components/ui/card-skeleton";
 import { useAuthStore } from "@/store";
 import { useMyAttempts } from "@/hooks";
 
@@ -20,8 +21,8 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
-        <Skeleton className="h-48" />
-        <Skeleton className="h-32" />
+        <CardSkeleton className="h-48" />
+        <CardSkeleton className="h-32" />
       </div>
     );
   }
@@ -85,10 +86,8 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="h-8 w-full" />
-              <Skeleton className="h-8 w-full" />
-              <Skeleton className="h-8 w-full" />
+            <div className="py-8">
+              <LoadingSpinner size="lg" message="Loading statistics..." />
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-3">

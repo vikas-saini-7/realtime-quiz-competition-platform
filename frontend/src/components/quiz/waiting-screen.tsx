@@ -1,6 +1,6 @@
 "use client";
 
-import { IconLoader2 } from "@tabler/icons-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { cn } from "@/lib/utils";
 
 interface WaitingScreenProps {
@@ -21,12 +21,7 @@ export function WaitingScreen({
         className,
       )}
     >
-      <div className="relative">
-        <div className="w-24 h-24 rounded-full border border-secondary animate-pulse" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <IconLoader2 className="h-10 w-10 text-primary animate-spin" />
-        </div>
-      </div>
+      <LoadingSpinner size="xl" />
       <div className="text-center space-y-2">
         <h2 className="text-xl font-semibold">{message}</h2>
         {subMessage && <p className="text-muted-foreground">{subMessage}</p>}

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { IconArrowLeft, IconTrophy } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CardSkeleton } from "@/components/ui/card-skeleton";
 import { Separator } from "@/components/ui/separator";
 import { LeaderboardTable, QuizStatusBadge } from "@/components/quiz";
 import { useQuiz, useLeaderboard, useAttemptsByQuiz } from "@/hooks";
@@ -27,13 +27,13 @@ export default function QuizResultsPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-10 w-64" />
+        <CardSkeleton className="h-10 w-64" showHeader={false} linesCount={1} />
         <div className="grid gap-6 lg:grid-cols-3">
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
+          <CardSkeleton className="h-32" />
+          <CardSkeleton className="h-32" />
+          <CardSkeleton className="h-32" />
         </div>
-        <Skeleton className="h-96" />
+        <CardSkeleton className="h-96" />
       </div>
     );
   }

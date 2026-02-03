@@ -7,4 +7,5 @@ export { ParticipantCounter } from "./participant-counter";
 export { QRCodeDisplay } from "./qr-code-display";
 export { ScoreDisplay } from "./score-display";
 export { WaitingScreen } from "./waiting-screen";
+export { PreviewQuizModal } from "./preview-quiz-modal";
 export { QuestionForm } from "./question-form";

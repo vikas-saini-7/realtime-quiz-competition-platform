@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconPlus, IconBrain } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CardSkeleton } from "@/components/ui/card-skeleton";
 import { QuizCard } from "@/components/quiz/quiz-card";
 import { CreateQuizModal } from "@/components/quiz/create-quiz-modal";
 import { useMyQuizzes, useDeleteQuiz, useUpdateQuiz } from "@/hooks";
@@ -68,7 +68,7 @@ export default function HostDashboardPage() {
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="h-56 w-full rounded-2xl" />
+            <CardSkeleton key={i} className="h-56" />
           ))}
         </div>
       ) : quizzes && quizzes.length > 0 ? (
