@@ -36,6 +36,10 @@ export default function JoinQuizConfirmPage() {
   const [isJoining, setIsJoining] = useState(false);
 
   const handleJoin = async () => {
+    console.log("Join button clicked");
+    console.log("isConnected:", isConnected);
+    console.log("quiz.id:", quiz?.id);
+
     if (!isConnected) {
       toast.error("Not connected to server");
       return;
@@ -48,12 +52,16 @@ export default function JoinQuizConfirmPage() {
 
     setIsJoining(true);
     try {
-      await join(quiz.id);
+      console.log("Attempting to join quiz with ID:", quiz.id);
+      const response = await join(quiz.id);
+      console.log("Join successful, response:", response);
       toast.success("Joined quiz!");
       router.push(`/play/${quiz.code}`);
     } catch (error) {
-      toast.error("Failed to join quiz");
-      console.error(error);
+      console.error("Join error:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to join quiz",
+      );
     } finally {
       setIsJoining(false);
     }

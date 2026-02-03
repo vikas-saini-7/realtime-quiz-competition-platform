@@ -44,6 +44,15 @@ interface QuizState {
   participantCount: number;
   participants: { id: string; name: string }[];
 
+  // Current question scores (for host - real-time)
+  questionScores: Array<{
+    userId: string;
+    userName: string;
+    score: number;
+    isCorrect: boolean;
+    timeTaken?: number;
+  }>;
+
   // Quiz status
   status: QuizSessionStatus;
 
@@ -61,6 +70,14 @@ interface QuizState {
   setParticipantCount: (count: number) => void;
   addParticipant: (id: string, name: string, count: number) => void;
   removeParticipant: (id: string, count: number) => void;
+  addQuestionScore: (
+    userId: string,
+    userName: string,
+    score: number,
+    isCorrect: boolean,
+    timeTaken?: number,
+  ) => void;
+  clearQuestionScores: () => void;
   setStatus: (status: QuizSessionStatus) => void;
   setTotalQuestions: (total: number) => void;
   endQuiz: (finalLeaderboard: LeaderboardEntry[]) => void;
@@ -85,6 +102,7 @@ const initialState = {
   leaderboard: [],
   participantCount: 0,
   participants: [],
+  questionScores: [],
   status: "idle" as QuizSessionStatus,
 };
 
@@ -101,7 +119,8 @@ export const useQuizStore = create<QuizState>((set) => ({
       status: "waiting",
     }),
 
-  setQuestion: (event) =>
+  setQuestion: (event) => {
+    console.log("[QuizStore] setQuestion called with event:", event);
     set({
       currentQuestion: event.question,
       questionIndex: event.questionIndex,
@@ -112,8 +131,15 @@ export const useQuizStore = create<QuizState>((set) => ({
       hasAnswered: false,
       lastAnswerResult: null,
       correctOption: null,
+      questionScores: [], // Clear question scores for new question
       status: "active",
-    }),
+    });
+    console.log(
+      "[QuizStore] Question set - Index:",
+      event.questionIndex,
+      "Status: active",
+    );
+  },
 
   submitAnswer: (option) =>
     set({
@@ -139,16 +165,67 @@ export const useQuizStore = create<QuizState>((set) => ({
   setParticipantCount: (count) => set({ participantCount: count }),
 
   addParticipant: (id, name, count) =>
-    set((state) => ({
-      participants: [...state.participants, { id, name }],
-      participantCount: count,
-    })),
+    set((state) => {
+      // Check if participant already exists
+      const existingParticipant = state.participants.find((p) => p.id === id);
+      if (existingParticipant) {
+        console.log("[QuizStore] Participant already exists, skipping:", {
+          id,
+          name,
+        });
+        // Just update the count, don't add duplicate
+        return {
+          participantCount: count,
+        };
+      }
+
+      console.log(
+        "[QuizStore] addParticipant called - id:",
+        id,
+        "name:",
+        name,
+        "count:",
+        count,
+      );
+      console.log(
+        "[QuizStore] Current participantCount:",
+        state.participantCount,
+      );
+      const newState = {
+        participants: [...state.participants, { id, name }],
+        participantCount: count,
+      };
+      console.log(
+        "[QuizStore] New participantCount:",
+        newState.participantCount,
+      );
+      return newState;
+    }),
 
   removeParticipant: (id, count) =>
     set((state) => ({
       participants: state.participants.filter((p) => p.id !== id),
       participantCount: count,
+      // Also remove from question scores if they were answering
+      questionScores: state.questionScores.filter((s) => s.userId !== id),
     })),
+
+  addQuestionScore: (userId, userName, score, isCorrect, timeTaken) =>
+    set((state) => {
+      // Check if user already answered
+      const existing = state.questionScores.find((s) => s.userId === userId);
+      if (existing) {
+        return state; // Don't add duplicate
+      }
+      return {
+        questionScores: [
+          ...state.questionScores,
+          { userId, userName, score, isCorrect, timeTaken },
+        ],
+      };
+    }),
+
+  clearQuestionScores: () => set({ questionScores: [] }),
 
   setStatus: (status) => set({ status }),
 

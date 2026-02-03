@@ -193,6 +193,7 @@ export interface ParticipantJoinedEvent {
 
 export interface ParticipantLeftEvent {
   userId: string;
+  userName: string;
   participantCount: number;
 }
 
@@ -227,4 +228,9 @@ export interface InitializeQuizResponse {
     currentQuestionIndex: number;
     totalQuestions: number;
   };
+  participantCount: number;
+  participants: Array<{
+    userId: string;
+    userName: string;
+  }>;
 }

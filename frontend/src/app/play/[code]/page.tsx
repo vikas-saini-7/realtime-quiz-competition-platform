@@ -29,11 +29,12 @@ export default function PlayQuizPage() {
 
   const { data: quiz, isLoading: isLoadingQuiz } = useQuizByCode(quizCode);
   const { isConnected } = useSocket();
-  const { submitAnswer } = useParticipantActions();
+  const { join, submitAnswer } = useParticipantActions();
   const { user } = useAuthStore();
 
   const {
     status,
+    quizId,
     quizTitle,
     currentQuestion,
     questionIndex,
@@ -49,22 +50,45 @@ export default function PlayQuizPage() {
   } = useQuizStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
 
-  // Redirect if not joined
+  // Auto-rejoin if status is idle but we have the quiz
   useEffect(() => {
-    if (!quiz?.id) return;
-    if (status === "idle" && isConnected) {
-      router.push(`/join/${quizCode}`);
-    }
-  }, [status, isConnected, quizCode, quiz, router]);
+    if (!quiz?.id || !isConnected || status !== "idle" || isJoining) return;
+
+    const autoJoin = async () => {
+      setIsJoining(true);
+      try {
+        await join(quiz.id);
+        console.log("[PlayQuiz] Auto-joined quiz successfully");
+      } catch (error) {
+        console.error("[PlayQuiz] Auto-join failed:", error);
+        // Only redirect to join page if auto-join fails
+        router.push(`/join/${quizCode}`);
+      } finally {
+        setIsJoining(false);
+      }
+    };
+
+    autoJoin();
+  }, [quiz?.id, isConnected, status, isJoining, join, quizCode, router]);
 
   const handleSelectOption = async (option: OptionLetter) => {
     if (hasAnswered || !currentQuestion || isSubmitting || !quiz?.id) return;
 
+    console.log("[PlayQuiz] Submitting answer:", {
+      option,
+      questionId: currentQuestion.id,
+      quizId: quiz.id,
+      hasAnswered,
+    });
+
     setIsSubmitting(true);
     try {
-      await submitAnswer(quiz.id, currentQuestion.id, option);
-    } catch {
+      const result = await submitAnswer(quiz.id, currentQuestion.id, option);
+      console.log("[PlayQuiz] Answer submitted successfully:", result);
+    } catch (error) {
+      console.error("[PlayQuiz] Failed to submit answer:", error);
       toast.error("Failed to submit answer");
     } finally {
       setIsSubmitting(false);
@@ -78,10 +102,10 @@ export default function PlayQuizPage() {
     return null;
   };
 
-  if (isLoadingQuiz) {
+  if (isLoadingQuiz || isJoining) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <WaitingScreen message="Loading..." />
+        <WaitingScreen message={isJoining ? "Joining quiz..." : "Loading..."} />
       </div>
     );
   }

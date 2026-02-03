@@ -22,6 +22,7 @@ import { User } from '../database/schema';
 interface AuthenticatedSocket extends Socket {
   data: {
     user: User;
+    quizId?: string;
   };
 }
 
@@ -53,51 +54,104 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection(client: AuthenticatedSocket) {
     try {
+      this.logger.log(`New connection attempt from client ${client.id}`);
+
       const token = this.extractToken(client);
       if (!token) {
-        this.logger.warn(`Client ${client.id} connection rejected: No token`);
+        this.logger.warn(`Client ${client.id} connection rejected: No token provided`);
+        client.emit('exception', {
+          status: 'error',
+          message: 'No authentication token provided',
+        });
         client.disconnect();
         return;
       }
 
+      this.logger.log(`Client ${client.id} - Token found, validating...`);
       const user = await this.authService.validateToken(token);
       if (!user) {
-        this.logger.warn(`Client ${client.id} connection rejected: Invalid token`);
+        this.logger.warn(
+          `Client ${client.id} connection rejected: Invalid or expired token`,
+        );
+        client.emit('exception', {
+          status: 'error',
+          message: 'Invalid or expired token',
+        });
         client.disconnect();
         return;
       }
 
       client.data.user = user;
-      this.logger.log(`User ${user.name} connected with socket ${client.id}`);
+      this.logger.log(
+        `User ${user.name} (${user.id}) connected successfully with socket ${client.id}`,
+      );
+
+      // Emit authenticated event to notify client that authentication is complete
+      client.emit('authenticated', { userId: user.id, userName: user.name });
     } catch (error) {
-      this.logger.error(`Connection error: ${error.message}`);
+      this.logger.error(
+        `Connection error for client ${client.id}: ${error.message}`,
+        error.stack,
+      );
+      client.emit('exception', { status: 'error', message: 'Authentication failed' });
       client.disconnect();
     }
   }
 
   async handleDisconnect(client: AuthenticatedSocket) {
     const user = client.data?.user;
+    const quizId = client.data?.quizId;
+
     if (user) {
       this.logger.log(`User ${user.name} disconnected`);
+
+      // If user was in a quiz, remove them
+      if (quizId) {
+        try {
+          await this.quizStateService.removeUserFromQuiz(quizId, user.id);
+
+          const roomName = this.getRoomName(quizId);
+          const userCount = await this.quizStateService.getUserCount(quizId);
+
+          // Notify others in the room
+          this.server.to(roomName).emit('participant:left', {
+            userId: user.id,
+            userName: user.name,
+            participantCount: userCount,
+          });
+
+          this.logger.log(
+            `User ${user.name} removed from quiz ${quizId} on disconnect`,
+          );
+        } catch (error) {
+          this.logger.error(`Error removing user on disconnect: ${error.message}`);
+        }
+      }
     }
   }
 
   private extractToken(client: Socket): string | null {
+    this.logger.debug(`Extracting token for client ${client.id}`);
+
     const authToken = client.handshake.auth?.token;
     if (authToken) {
+      this.logger.debug(`Token found in auth object`);
       return authToken.replace('Bearer ', '');
     }
 
     const queryToken = client.handshake.query?.token;
     if (queryToken && typeof queryToken === 'string') {
+      this.logger.debug(`Token found in query params`);
       return queryToken.replace('Bearer ', '');
     }
 
     const authHeader = client.handshake.headers?.authorization;
     if (authHeader) {
+      this.logger.debug(`Token found in authorization header`);
       return authHeader.replace('Bearer ', '');
     }
 
+    this.logger.debug(`No token found in any location`);
     return null;
   }
 
@@ -145,12 +199,24 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const roomName = this.getRoomName(data.quizId);
     client.join(roomName);
 
+    // Get current participant count
+    const participantCount = await this.quizStateService.getUserCount(data.quizId);
+
+    // Get current participants list
+    const users = await this.quizStateService.getQuizUsers(data.quizId);
+    const participants = users.map((user) => ({
+      userId: user.userId,
+      userName: user.userName,
+    }));
+
     this.logger.log(`Host ${user.name} initialized quiz ${data.quizId}`);
 
     return {
       success: true,
       quizId: data.quizId,
       state,
+      participantCount,
+      participants,
     };
   }
 
@@ -223,7 +289,7 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // Broadcast question to all participants (without correct answer)
     const roomName = this.getRoomName(data.quizId);
-    this.server.to(roomName).emit('quiz:question', {
+    const questionData = {
       questionIndex: nextIndex,
       totalQuestions: state.totalQuestions,
       question: {
@@ -237,7 +303,14 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
       },
       startTime: Date.now(),
       endTime: Date.now() + question.timeLimit * 1000,
-    });
+    };
+
+    this.logger.log(
+      `Broadcasting question ${nextIndex + 1}/${state.totalQuestions} to room ${roomName}`,
+    );
+    this.logger.debug(`Question data: ${JSON.stringify(questionData)}`);
+
+    this.server.to(roomName).emit('quiz:question', questionData);
 
     this.logger.log(
       `Question ${nextIndex + 1}/${state.totalQuestions} sent for quiz ${data.quizId}`,
@@ -281,65 +354,125 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() data: { quizId: string },
   ) {
-    const user = client.data.user;
-    if (!user) {
-      throw new WsException('User not authenticated');
+    try {
+      const user = client.data.user;
+      if (!user) {
+        throw new WsException('User not authenticated');
+      }
+
+      this.logger.log(`User ${user.name} attempting to join quiz ${data.quizId}`);
+
+      const quiz = await this.quizzesService.findById(data.quizId);
+      if (!quiz) {
+        throw new WsException('Quiz not found');
+      }
+
+      this.logger.log(
+        `Quiz found: ${quiz.title}, status: ${quiz.status}, hostId: ${quiz.hostId}`,
+      );
+
+      if (quiz.status !== 'LIVE') {
+        throw new WsException('Quiz is not live');
+      }
+
+      // Get or auto-initialize quiz state
+      let state = await this.quizStateService.getQuizState(data.quizId);
+      if (!state) {
+        // Auto-initialize the quiz state if it doesn't exist
+        this.logger.log(`Quiz state not found in Redis, fetching question count...`);
+        const questionCount = await this.questionsService.getQuestionCount(data.quizId);
+        this.logger.log(`Question count: ${questionCount}`);
+
+        if (questionCount === 0) {
+          throw new WsException('Quiz has no questions');
+        }
+
+        this.logger.warn(`Auto-initializing quiz state for quiz ${data.quizId}`);
+        state = await this.quizStateService.initializeQuizState(
+          data.quizId,
+          quiz.hostId,
+          questionCount,
+        );
+        this.logger.log(`Quiz state initialized successfully`);
+      }
+
+      // Check if user is already in the quiz
+      const isAlreadyInQuiz = await this.quizStateService.isUserInQuiz(
+        data.quizId,
+        user.id,
+      );
+
+      // Create or get attempt
+      this.logger.log(`Creating/getting attempt for user ${user.id}`);
+      const attempt = await this.attemptsService.getOrCreateAttempt(
+        user.id,
+        data.quizId,
+      );
+      this.logger.log(`Attempt ID: ${attempt.id}`);
+
+      if (isAlreadyInQuiz) {
+        // User is reconnecting - just update their socket ID
+        this.logger.log(`User ${user.name} is reconnecting to quiz ${data.quizId}`);
+        await this.quizStateService.updateUserSocket(data.quizId, user.id, client.id);
+      } else {
+        // New participant - add to quiz state
+        this.logger.log(
+          `User ${user.name} is joining quiz ${data.quizId} for the first time`,
+        );
+        await this.quizStateService.addUserToQuiz(
+          data.quizId,
+          user.id,
+          user.name,
+          client.id,
+        );
+
+        // Initialize user in leaderboard with 0 score
+        await this.leaderboardService.addOrUpdateScore(
+          data.quizId,
+          user.id,
+          user.name,
+          0,
+        );
+      }
+
+      // Join the quiz room
+      const roomName = this.getRoomName(data.quizId);
+      client.join(roomName);
+
+      // Store quizId in client data for disconnect handling
+      client.data.quizId = data.quizId;
+
+      // Only notify host of new participant if they weren't already in the quiz
+      if (!isAlreadyInQuiz) {
+        const userCount = await this.quizStateService.getUserCount(data.quizId);
+        this.server.to(roomName).emit('participant:joined', {
+          userId: user.id,
+          userName: user.name,
+          participantCount: userCount,
+        });
+      }
+
+      this.logger.log(`User ${user.name} successfully joined quiz ${data.quizId}`);
+
+      return {
+        success: true,
+        quizId: data.quizId,
+        attemptId: attempt.id,
+        quizTitle: quiz.title,
+        status: state.status,
+        currentQuestionIndex: state.currentQuestionIndex,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Error in handleParticipantJoin: ${error.message}`,
+        error.stack,
+      );
+      throw error;
     }
-
-    const quiz = await this.quizzesService.findById(data.quizId);
-    if (!quiz) {
-      throw new WsException('Quiz not found');
-    }
-
-    if (quiz.status !== 'LIVE') {
-      throw new WsException('Quiz is not live');
-    }
-
-    const state = await this.quizStateService.getQuizState(data.quizId);
-    if (!state) {
-      throw new WsException('Quiz session not active');
-    }
-
-    // Create or get attempt
-    const attempt = await this.attemptsService.getOrCreateAttempt(user.id, data.quizId);
-
-    // Add user to quiz state
-    await this.quizStateService.addUserToQuiz(
-      data.quizId,
-      user.id,
-      user.name,
-      client.id,
-    );
-
-    // Initialize user in leaderboard with 0 score
-    await this.leaderboardService.addOrUpdateScore(data.quizId, user.id, user.name, 0);
-
-    // Join the quiz room
-    const roomName = this.getRoomName(data.quizId);
-    client.join(roomName);
-
-    // Notify host of new participant
-    const userCount = await this.quizStateService.getUserCount(data.quizId);
-    this.server.to(roomName).emit('participant:joined', {
-      userId: user.id,
-      userName: user.name,
-      participantCount: userCount,
-    });
-
-    this.logger.log(`User ${user.name} joined quiz ${data.quizId}`);
-
-    return {
-      success: true,
-      quizId: data.quizId,
-      attemptId: attempt.id,
-      quizTitle: quiz.title,
-      status: state.status,
-      currentQuestionIndex: state.currentQuestionIndex,
-    };
   }
 
-  @SubscribeMessage('participant:answer')
-  async handleParticipantAnswer(
+  @SubscribeMessage('answer:submit')
+  async handleSubmitAnswer(
     @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody()
     data: {
@@ -353,8 +486,22 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException('User not authenticated');
     }
 
+    this.logger.log(
+      `User ${user.name} submitting answer for question ${data.questionId} in quiz ${data.quizId}`,
+    );
+
     const state = await this.quizStateService.getQuizState(data.quizId);
-    if (!state || state.status !== 'question') {
+    if (!state) {
+      this.logger.error(`Quiz state not found for quiz ${data.quizId}`);
+      throw new WsException('Quiz not found');
+    }
+
+    this.logger.debug(`Quiz state status: ${state.status}`);
+
+    if (state.status !== 'question') {
+      this.logger.warn(
+        `Not accepting answers - Quiz status is ${state.status}, expected 'question'`,
+      );
       throw new WsException('Not accepting answers at this time');
     }
 
@@ -425,6 +572,10 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
       newTotalScore,
     );
 
+    this.logger.log(
+      `Leaderboard updated - User: ${user.name}, New Total Score: ${newTotalScore}`,
+    );
+
     // Send acknowledgment to participant
     client.emit('answer:received', {
       questionId: data.questionId,
@@ -433,8 +584,19 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
       totalScore: newTotalScore,
     });
 
+    // Broadcast to host/room that participant answered (for real-time question scores)
+    const roomName = this.getRoomName(data.quizId);
+    this.server.to(roomName).emit('participant:answered', {
+      userId: user.id,
+      userName: user.name,
+      questionId: data.questionId,
+      isCorrect,
+      scoreAwarded,
+      timeTaken: Math.max(0, question.timeLimit * 1000 - remainingTime * 1000),
+    });
+
     this.logger.log(
-      `User ${user.name} answered question ${data.questionId}: ${isCorrect ? 'correct' : 'wrong'}, score: ${scoreAwarded}`,
+      `User ${user.name} answered question ${data.questionId}: ${isCorrect ? 'correct' : 'wrong'}, score: ${scoreAwarded}, total: ${newTotalScore}`,
     );
 
     return {
@@ -460,9 +622,13 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const roomName = this.getRoomName(data.quizId);
     client.leave(roomName);
 
+    // Clear quizId from client data
+    client.data.quizId = undefined;
+
     const userCount = await this.quizStateService.getUserCount(data.quizId);
     this.server.to(roomName).emit('participant:left', {
       userId: user.id,
+      userName: user.name,
       participantCount: userCount,
     });
 

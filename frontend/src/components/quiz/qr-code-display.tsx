@@ -29,16 +29,16 @@ export function QRCodeDisplay({ quizCode, title }: QRCodeDisplayProps) {
   };
 
   return (
-    <Card className="w-fit">
+    <Card className="w-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">{title || "Scan to Join"}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
         <div className="p-4 bg-white rounded-lg">
-          <QRCodeSVG value={joinUrl} size={180} level="M" />
+          <QRCodeSVG value={joinUrl} size={160} level="M" />
         </div>
         <div className="flex items-center gap-2 w-full">
-          <code className="flex-1 px-3 py-2 bg-secondary rounded text-sm truncate">
+          <code className="flex-1 px-3 py-2 bg-secondary rounded text-sm truncate text-xs">
             {joinUrl}
           </code>
           <Button variant="outline" size="icon" onClick={handleCopy}>

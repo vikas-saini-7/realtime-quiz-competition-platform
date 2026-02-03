@@ -157,7 +157,13 @@ export class QuizStateService {
     const usersKey = this.getUsersKey(quizId);
     const data = await this.redisService.hgetall(usersKey);
 
-    return Object.values(data).map((json) => JSON.parse(json));
+    return Object.values(data).map((value) => {
+      // Handle both string and already-parsed object
+      if (typeof value === 'string') {
+        return JSON.parse(value);
+      }
+      return value as JoinedUser;
+    });
   }
 
   async getUserCount(quizId: string): Promise<number> {

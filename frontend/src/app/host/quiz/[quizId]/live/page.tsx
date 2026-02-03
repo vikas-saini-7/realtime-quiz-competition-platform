@@ -38,10 +38,13 @@ export default function LiveQuizPage() {
   const {
     status,
     participantCount,
+    participants,
     questionIndex,
     totalQuestions,
     leaderboard,
     currentQuestion,
+    questionEndTime,
+    questionScores,
     setStatus,
     setTotalQuestions,
     reset,
@@ -51,6 +54,47 @@ export default function LiveQuizPage() {
   const [isStarting, setIsStarting] = useState(false);
   const [isAdvancing, setIsAdvancing] = useState(false);
   const [isEnding, setIsEnding] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (!isTimerActive || timeRemaining === null || timeRemaining <= 0) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setTimeRemaining((prev) => {
+        if (prev === null || prev <= 0) {
+          setIsTimerActive(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isTimerActive, timeRemaining]);
+
+  // Start timer when new question is displayed
+  useEffect(() => {
+    if (currentQuestion && questionEndTime) {
+      const remaining = Math.max(
+        0,
+        Math.ceil((questionEndTime - Date.now()) / 1000),
+      );
+      setTimeRemaining(remaining);
+      setIsTimerActive(true);
+    }
+  }, [currentQuestion, questionEndTime]);
+
+  // Stop timer when question ends
+  useEffect(() => {
+    if (status === "between_questions") {
+      setIsTimerActive(false);
+      setTimeRemaining(null);
+    }
+  }, [status]);
 
   // Initialize quiz session on mount
   useEffect(() => {
@@ -87,6 +131,31 @@ export default function LiveQuizPage() {
       reset();
     };
   }, [reset]);
+
+  // Debug: Log participantCount changes
+  useEffect(() => {
+    console.log("[LiveQuizPage] Participant count updated:", participantCount);
+  }, [participantCount]);
+
+  // Fetch initial leaderboard when quiz starts
+  useEffect(() => {
+    if (status === "active" && socket && quizId) {
+      console.log("[LiveQuizPage] Quiz started, fetching initial leaderboard");
+      socket.emit(
+        "leaderboard:get",
+        { quizId, limit: 10 },
+        (response: { success: boolean; leaderboard: any[] }) => {
+          if (response.success && response.leaderboard) {
+            console.log(
+              "[LiveQuizPage] Initial leaderboard fetched:",
+              response.leaderboard,
+            );
+            useQuizStore.getState().updateLeaderboard(response.leaderboard);
+          }
+        },
+      );
+    }
+  }, [status, socket, quizId]);
 
   const handleStart = async () => {
     setIsStarting(true);
@@ -167,9 +236,11 @@ export default function LiveQuizPage() {
               <h1 className="text-2xl font-bold">{quiz.title}</h1>
               <QuizStatusBadge status={quiz.status} />
             </div>
-            <p className="text-muted-foreground">
-              {isConnected ? "Connected" : "Connecting..."}
-            </p>
+            {status === "idle" && (
+              <p className="text-muted-foreground">
+                {isConnected ? "Connected" : "Connecting..."}
+              </p>
+            )}
           </div>
         </div>
         <div className="flex gap-2">
@@ -221,20 +292,34 @@ export default function LiveQuizPage() {
                   Start Quiz
                 </Button>
               ) : status === "active" || status === "between_questions" ? (
-                <Button
-                  onClick={handleNextQuestion}
-                  disabled={isAdvancing}
-                  className="w-full"
-                  size="lg"
-                >
-                  {isAdvancing && (
-                    <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                <div className="space-y-3">
+                  <Button
+                    onClick={handleNextQuestion}
+                    disabled={isAdvancing || isTimerActive}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {isAdvancing && (
+                      <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    <IconPlayerSkipForward className="h-5 w-5 mr-2" />
+                    {questionIndex === -1
+                      ? "Show First Question"
+                      : status === "active" && isTimerActive
+                        ? `Wait for (${timeRemaining}s)`
+                        : "Next Question"}
+                  </Button>
+                  {isTimerActive && timeRemaining !== null && (
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-primary">
+                        {timeRemaining}s
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Time remaining
+                      </div>
+                    </div>
                   )}
-                  <IconPlayerSkipForward className="h-5 w-5 mr-2" />
-                  {questionIndex === -1
-                    ? "Show First Question"
-                    : "Next Question"}
-                </Button>
+                </div>
               ) : status === "finished" ? (
                 <p className="text-center text-muted-foreground py-4">
                   Quiz has ended
@@ -254,37 +339,85 @@ export default function LiveQuizPage() {
           </Card>
 
           <ParticipantCounter count={participantCount} />
+
+          {status === "waiting" && quiz?.code && (
+            <QRCodeDisplay quizCode={quiz.code} />
+          )}
         </div>
 
-        {/* Center: Current Question */}
+        {/* Center: Question Scores */}
         <div>
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>Current Question</CardTitle>
+              <CardTitle>
+                {currentQuestion
+                  ? "Current Question Scores"
+                  : "Current Question"}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {currentQuestion ? (
                 <div className="space-y-4">
-                  <p className="text-lg font-medium">
-                    {currentQuestion.questionText}
-                  </p>
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      <span className="font-medium">A:</span>{" "}
-                      {currentQuestion.optionA}
+                  {/* Question Text */}
+                  <div className="pb-4 border-b">
+                    <p className="text-sm font-medium text-muted-foreground mb-2">
+                      Question {questionIndex + 1}:
                     </p>
-                    <p className="text-sm">
-                      <span className="font-medium">B:</span>{" "}
-                      {currentQuestion.optionB}
+                    <p className="text-base font-medium">
+                      {currentQuestion.questionText}
                     </p>
-                    <p className="text-sm">
-                      <span className="font-medium">C:</span>{" "}
-                      {currentQuestion.optionC}
-                    </p>
-                    <p className="text-sm">
-                      <span className="font-medium">D:</span>{" "}
-                      {currentQuestion.optionD}
-                    </p>
+                  </div>
+
+                  {/* Real-time Scores */}
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {questionScores.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-8">
+                        Waiting for participants to answer...
+                      </p>
+                    ) : (
+                      questionScores
+                        .sort((a, b) => {
+                          // Sort by score (descending), then by time (ascending)
+                          if (b.score !== a.score) return b.score - a.score;
+                          return a.timeTaken - b.timeTaken;
+                        })
+                        .map((scoreEntry, index) => (
+                          <div
+                            key={scoreEntry.userId}
+                            className={`flex items-center gap-3 p-3 rounded-lg ${
+                              scoreEntry.isCorrect
+                                ? "bg-green-500/10 border border-green-500/20"
+                                : "bg-red-500/10 border border-red-500/20"
+                            }`}
+                          >
+                            <div
+                              className={`flex items-center justify-center w-8 h-8 rounded-full font-semibold text-sm ${
+                                scoreEntry.isCorrect
+                                  ? "bg-green-500/20 text-green-700 dark:text-green-400"
+                                  : "bg-red-500/20 text-red-700 dark:text-red-400"
+                              }`}
+                            >
+                              {index + 1}
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-medium">
+                                {scoreEntry.userName}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {(scoreEntry.timeTaken / 1000).toFixed(1)}s
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-bold text-lg">
+                                {scoreEntry.score}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {scoreEntry.isCorrect ? "✓ Correct" : "✗ Wrong"}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                    )}
                   </div>
                 </div>
               ) : (
@@ -298,18 +431,42 @@ export default function LiveQuizPage() {
           </Card>
         </div>
 
-        {/* Right: QR Code & Leaderboard */}
+        {/* Right: Leaderboard */}
         <div className="space-y-6">
-          {status === "waiting" && quiz?.code && (
-            <QRCodeDisplay quizCode={quiz.code} />
-          )}
-
           <Card>
             <CardHeader>
-              <CardTitle>Leaderboard</CardTitle>
+              <CardTitle>
+                {status === "waiting" ? "Participants" : "Leaderboard"}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <LeaderboardTable entries={leaderboard} />
+              {status === "waiting" ? (
+                <div className="space-y-2">
+                  {participants.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-4">
+                      No participants yet
+                    </p>
+                  ) : (
+                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                      {participants.map((participant, index) => (
+                        <div
+                          key={participant.id}
+                          className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50"
+                        >
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1 font-medium">
+                            {participant.name}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <LeaderboardTable entries={leaderboard} />
+              )}
             </CardContent>
           </Card>
         </div>

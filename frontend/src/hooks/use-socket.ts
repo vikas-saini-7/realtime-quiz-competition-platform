@@ -14,6 +14,7 @@ import type {
   OptionLetter,
   JoinQuizResponse,
   InitializeQuizResponse,
+  LeaderboardEntry,
 } from "@/types";
 
 let socket: Socket | null = null;
@@ -33,6 +34,7 @@ export function useSocket() {
     removeParticipant,
     setAnswerResult,
     setStatus,
+    updateLeaderboard,
     reset,
   } = useQuizStore();
 
@@ -41,10 +43,13 @@ export function useSocket() {
   useEffect(() => {
     if (!accessToken || isInitialized.current) return;
 
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "http://localhost:3000";
+    console.log("[Socket] Initializing socket connection...");
+    console.log("[Socket] Access token available:", !!accessToken);
 
-    socket = io(wsUrl, {
-      path: "/quiz",
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "http://localhost:3000";
+    console.log("[Socket] WS URL:", wsUrl);
+
+    socket = io(`${wsUrl}/quiz`, {
       auth: {
         token: `Bearer ${accessToken}`,
       },
@@ -55,49 +60,74 @@ export function useSocket() {
     });
 
     socket.on("connect", () => {
-      console.log("Socket connected");
+      console.log("[Socket] Transport connected - Socket ID:", socket?.id);
+      console.log("[Socket] Waiting for authentication...");
+    });
+
+    socket.on("authenticated", (data) => {
+      console.log("[Socket] Authentication successful:", data);
       setConnected(true);
     });
 
     socket.on("disconnect", () => {
-      console.log("Socket disconnected");
+      console.log("[Socket] Disconnected");
       setConnected(false);
     });
 
     socket.on("connect_error", (error) => {
-      console.error("Socket connection error:", error);
+      console.error("[Socket] Connection error:", error);
+      console.error("[Socket] Error message:", error.message);
       setConnected(false);
+    });
+
+    socket.on("error", (error) => {
+      console.error("[Socket] Socket error:", error);
+    });
+
+    socket.on("exception", (error) => {
+      console.error("[Socket] Socket exception:", error);
     });
 
     // Quiz events
     socket.on("quiz:started", (data: QuizStartedEvent) => {
-      console.log("Quiz started:", data);
+      console.log("[Socket] Quiz started event received:", data);
       setStatus("active");
     });
 
     socket.on("quiz:question", (data: QuizQuestionEvent) => {
-      console.log("New question:", data);
+      console.log("[Socket] New question event received:", data);
+      console.log("[Socket] Question index:", data.questionIndex);
+      console.log("[Socket] Question text:", data.question?.questionText);
       setQuestion(data);
     });
 
     socket.on("quiz:question-ended", (data: QuizQuestionEndedEvent) => {
-      console.log("Question ended:", data);
+      console.log("[Socket] Question ended event received:", data);
+      console.log("[Socket] Correct option:", data.correctOption);
+      console.log("[Socket] Leaderboard entries:", data.leaderboard?.length);
       setQuestionEnded(data.correctOption, data.leaderboard);
     });
 
     socket.on("quiz:ended", (data: QuizEndedEvent) => {
-      console.log("Quiz ended:", data);
+      console.log("[Socket] Quiz ended event received:", data);
       endQuiz(data.finalLeaderboard);
     });
 
     // Participant events
     socket.on("participant:joined", (data: ParticipantJoinedEvent) => {
-      console.log("Participant joined:", data);
+      console.log("[Socket] Participant joined event received:", data);
       addParticipant(data.userId, data.userName, data.participantCount);
+      console.log(
+        "[Socket] addParticipant called with count:",
+        data.participantCount,
+      );
     });
 
     socket.on("participant:left", (data: ParticipantLeftEvent) => {
-      console.log("Participant left:", data);
+      console.log("[Socket] Participant left event received:", data);
+      console.log(
+        `[Socket] ${data.userName} disconnected, remaining: ${data.participantCount}`,
+      );
       removeParticipant(data.userId, data.participantCount);
     });
 
@@ -106,6 +136,27 @@ export function useSocket() {
       console.log("Answer received:", data);
       setAnswerResult(data);
     });
+
+    // Real-time question answers (for host)
+    socket.on("participant:answered", (data) => {
+      console.log("[Socket] Participant answered:", data);
+      useQuizStore.getState().addQuestionScore({
+        userId: data.userId,
+        userName: data.userName,
+        score: data.scoreAwarded,
+        isCorrect: data.isCorrect,
+        timeTaken: data.timeTaken,
+      });
+    });
+
+    // Leaderboard updates
+    socket.on(
+      "leaderboard:update",
+      (data: { leaderboard: LeaderboardEntry[] }) => {
+        console.log("[Socket] Leaderboard update received:", data);
+        updateLeaderboard(data.leaderboard);
+      },
+    );
 
     isInitialized.current = true;
 
@@ -126,6 +177,7 @@ export function useSocket() {
     removeParticipant,
     setAnswerResult,
     setStatus,
+    updateLeaderboard,
   ]);
 
   const disconnect = useCallback(() => {
@@ -146,7 +198,8 @@ export function useSocket() {
 
 // Host actions
 export function useHostActions() {
-  const { setTotalQuestions, setStatus, setParticipantCount } = useQuizStore();
+  const { setTotalQuestions, setStatus, setParticipantCount, reset } =
+    useQuizStore();
 
   const initializeQuiz = useCallback(
     (quizId: string): Promise<InitializeQuizResponse> => {
@@ -161,9 +214,23 @@ export function useHostActions() {
           { quizId },
           (response: InitializeQuizResponse) => {
             if (response.success) {
+              // Reset store to clear any previous quiz data
+              reset();
               setTotalQuestions(response.state.totalQuestions);
               setStatus("waiting");
-              setParticipantCount(0);
+              setParticipantCount(response.participantCount || 0);
+              // Set the participants who joined earlier
+              if (response.participants && response.participants.length > 0) {
+                response.participants.forEach((p) => {
+                  useQuizStore
+                    .getState()
+                    .addParticipant(
+                      p.userId,
+                      p.userName,
+                      response.participantCount,
+                    );
+                });
+              }
               resolve(response);
             } else {
               reject(new Error("Failed to initialize quiz"));
@@ -172,7 +239,7 @@ export function useHostActions() {
         );
       });
     },
-    [setTotalQuestions, setStatus, setParticipantCount],
+    [setTotalQuestions, setStatus, setParticipantCount, reset],
   );
 
   const startQuiz = useCallback((quizId: string): Promise<void> => {
@@ -263,14 +330,31 @@ export function useParticipantActions() {
     (quizId: string): Promise<JoinQuizResponse> => {
       return new Promise((resolve, reject) => {
         if (!socket) {
+          console.error("Join failed: Socket not connected");
           reject(new Error("Socket not connected"));
           return;
         }
+
+        if (!socket.connected) {
+          console.error("Join failed: Socket not in connected state");
+          reject(new Error("Socket not in connected state"));
+          return;
+        }
+
+        console.log("Emitting participant:join with quizId:", quizId);
+
+        // Set a timeout in case the server doesn't respond
+        const timeout = setTimeout(() => {
+          console.error("Join timeout: No response from server");
+          reject(new Error("Request timeout - server did not respond"));
+        }, 10000); // 10 second timeout
 
         socket.emit(
           "participant:join",
           { quizId },
           (response: JoinQuizResponse) => {
+            clearTimeout(timeout);
+            console.log("Join response received:", response);
             if (response.success) {
               joinQuiz(response.quizId, response.attemptId, response.quizTitle);
               resolve(response);
@@ -303,7 +387,7 @@ export function useParticipantActions() {
         setSubmitAnswer(selectedOption);
 
         socket.emit(
-          "participant:answer",
+          "answer:submit",
           { quizId, questionId, selectedOption },
           (response: {
             success: boolean;
