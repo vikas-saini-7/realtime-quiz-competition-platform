@@ -19,6 +19,8 @@ import {
   IconShare,
   IconGripVertical,
   IconEye,
+  IconLayoutList,
+  IconLayoutGrid,
 } from "@tabler/icons-react";
 import {
   DndContext,
@@ -35,6 +37,7 @@ import {
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
+  horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
@@ -96,6 +99,64 @@ const questionSchema = z.object({
 
 type QuestionFormValues = z.infer<typeof questionSchema>;
 
+function SortableQuestionBox({
+  questionId,
+  index,
+  isSelected,
+  onClick,
+}: {
+  questionId: string;
+  index: number;
+  isSelected: boolean;
+  onClick: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: questionId });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`w-12 rounded-lg overflow-hidden transition-all duration-200 ${
+        isDragging
+          ? "opacity-50 scale-95"
+          : isSelected
+            ? "bg-primary text-primary-foreground shadow-md scale-105"
+            : "bg-background border-2 hover:border-primary/50 hover:scale-105"
+      }`}
+    >
+      {/* Drag Handle */}
+      <div
+        className={`h-5 flex items-center justify-center cursor-grab active:cursor-grabbing ${
+          isSelected ? "bg-primary-foreground/20" : "bg-muted hover:bg-muted/80"
+        }`}
+        {...attributes}
+        {...listeners}
+      >
+        <IconGripVertical className="h-3 w-3 opacity-60" />
+      </div>
+      {/* Clickable Number */}
+      <button
+        onClick={onClick}
+        className="w-full h-9 flex items-center justify-center font-semibold cursor-pointer"
+      >
+        {index + 1}
+      </button>
+    </div>
+  );
+}
+
 function QuestionCard({
   question,
   index,
@@ -131,11 +192,11 @@ function QuestionCard({
       <Card
         ref={setNodeRef}
         style={style}
-        className="overflow-hidden rounded-xl"
+        className="overflow-hidden rounded-xl border-2"
       >
         <CardHeader className="py-4 px-5">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4 flex-1 min-w-0">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
               <button
                 className="cursor-grab active:cursor-grabbing touch-none hover:bg-accent rounded-lg p-1.5 transition-colors"
                 {...attributes}
@@ -143,50 +204,30 @@ function QuestionCard({
               >
                 <IconGripVertical className="h-4 w-4 text-muted-foreground" />
               </button>
-              <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary text-sm font-semibold shrink-0">
-                {index + 1}
-              </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-base truncate text-foreground">
+                <h3 className="font-medium text-lg truncate text-foreground">
                   {question.questionText || "Untitled Question"}
                 </h3>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1.5">
-                  <span className="flex items-center gap-1">
-                    <span className="text-[10px]">⏱️</span>
-                    {question.timeLimit}s
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="text-green-600">✓</span>
-                    {question.baseScore} pts
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="text-red-600">✗</span>
-                    {question.negativeScore} pts
-                  </span>
-                  <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-medium">
-                    Answer: {question.correctOption}
-                  </span>
-                </div>
               </div>
             </div>
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="h-8 w-8 p-0 rounded-lg"
                 onClick={onEdit}
               >
-                <IconEdit className="h-4 w-4" />
+                <IconEdit className="h-4 w-4 mr-1" />
+                Edit
               </Button>
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="h-8 w-8 p-0 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10"
                 onClick={onDelete}
               >
-                <IconTrash className="h-4 w-4" />
+                <IconTrash className="h-4 w-4 mr-1" />
+                Delete
               </Button>
               <CollapsibleTrigger asChild>
                 <Button
@@ -205,44 +246,37 @@ function QuestionCard({
           </div>
         </CardHeader>
         <CollapsibleContent>
-          <CardContent className="pt-4 px-5 pb-5">
-            <div className="space-y-5">
-              <div>
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                  Question
-                </h4>
-                <p className="text-base text-foreground leading-relaxed">
-                  {question.questionText}
-                </p>
-              </div>
-              <div>
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                  Options
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {(["A", "B", "C", "D"] as const).map((option) => (
-                    <div
-                      key={option}
-                      className={`p-3.5 rounded-xl border transition-colors ${
-                        question.correctOption === option
-                          ? "border-green-500/50 bg-green-50 dark:bg-green-950/30"
-                          : "border-border hover:border-border/80"
-                      }`}
-                    >
-                      <div className="flex items-start gap-2.5">
-                        <span className="font-semibold text-sm text-muted-foreground min-w-[20px]">
-                          {option}.
-                        </span>
-                        <span className="flex-1 text-sm">
-                          {question[`option${option}`]}
-                        </span>
-                        {question.correctOption === option && (
-                          <IconCheck className="h-4 w-4 text-green-600 shrink-0" />
-                        )}
+          <CardContent className="pt-0 px-5 pb-5">
+            <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(["A", "B", "C", "D"] as const).map((option) => (
+                  <div
+                    key={option}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      question.correctOption === option
+                        ? "border-green-500 bg-green-50 dark:bg-green-950/30 shadow-sm"
+                        : "border-border hover:border-border/60"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm ${
+                          question.correctOption === option
+                            ? "bg-green-500 text-white"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {option}
                       </div>
+                      <span className="flex-1 text-base pt-0.5">
+                        {question[`option${option}`]}
+                      </span>
+                      {question.correctOption === option && (
+                        <IconCheck className="h-5 w-5 text-green-600 shrink-0 mt-1" />
+                      )}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           </CardContent>
@@ -268,6 +302,8 @@ export default function EditQuizPage() {
   const [editQuestionModalOpen, setEditQuestionModalOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "card">("list");
+  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -461,38 +497,210 @@ export default function EditQuizPage() {
               {quiz.questions?.length !== 1 ? "s" : ""} created
             </p>
           </div>
-          <Button onClick={() => setAddQuestionModalOpen(true)}>
-            <IconPlus className="h-4 w-4 mr-2" />
-            Add Question
-          </Button>
+          <div className="flex items-center gap-2">
+            {quiz.questions && quiz.questions.length > 0 && (
+              <div className="flex items-center gap-1 bg-background border rounded-lg p-1">
+                <Button
+                  variant={viewMode === "list" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className="h-8 px-3"
+                >
+                  <IconLayoutList className="h-4 w-4 mr-1" />
+                  List
+                </Button>
+                <Button
+                  variant={viewMode === "card" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("card")}
+                  className="h-8 px-3"
+                >
+                  <IconLayoutGrid className="h-4 w-4 mr-1" />
+                  Card
+                </Button>
+              </div>
+            )}
+            <Button onClick={() => setAddQuestionModalOpen(true)}>
+              <IconPlus className="h-4 w-4 mr-2" />
+              Add Question
+            </Button>
+          </div>
         </div>
 
         {quiz.questions && quiz.questions.length > 0 ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={quiz.questions.map((q) => q.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-3">
-                {quiz.questions
-                  .sort((a, b) => a.orderIndex - b.orderIndex)
-                  .map((question, index) => (
-                    <QuestionCard
-                      key={question.id}
-                      question={question}
-                      index={index}
-                      onEdit={() => handleEditQuestionClick(question)}
-                      onDelete={() => handleDeleteQuestion(question.id)}
-                      isUpdating={updateQuestion.isPending}
-                    />
-                  ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+          <>
+            {viewMode === "list" ? (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={quiz.questions.map((q) => q.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-3">
+                    {quiz.questions
+                      .sort((a, b) => a.orderIndex - b.orderIndex)
+                      .map((question, index) => (
+                        <QuestionCard
+                          key={question.id}
+                          question={question}
+                          index={index}
+                          onEdit={() => handleEditQuestionClick(question)}
+                          onDelete={() => handleDeleteQuestion(question.id)}
+                          isUpdating={updateQuestion.isPending}
+                        />
+                      ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            ) : (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={quiz.questions.map((q) => q.id)}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  <div className="space-y-4">
+                    {/* Question Navigation Boxes */}
+                    <div className="flex flex-wrap gap-2 p-4 bg-muted/30 rounded-lg border">
+                      {quiz.questions
+                        .sort((a, b) => a.orderIndex - b.orderIndex)
+                        .map((question, index) => (
+                          <SortableQuestionBox
+                            key={question.id}
+                            questionId={question.id}
+                            index={index}
+                            isSelected={selectedQuestionIndex === index}
+                            onClick={() => setSelectedQuestionIndex(index)}
+                          />
+                        ))}
+                    </div>
+
+                    {/* Selected Question Display */}
+                    {quiz.questions
+                      .sort((a, b) => a.orderIndex - b.orderIndex)
+                      .map((question, index) => {
+                        if (index !== selectedQuestionIndex) return null;
+
+                        return (
+                          <Card key={question.id} className="border-2">
+                            <CardHeader className="pb-4">
+                              <div className="flex items-center justify-between gap-4">
+                                <CardTitle className="text-lg truncate flex-1">
+                                  {question.questionText}
+                                </CardTitle>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleEditQuestionClick(question)
+                                    }
+                                  >
+                                    <IconEdit className="h-4 w-4 mr-1" />
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleDeleteQuestion(question.id)
+                                    }
+                                    disabled={updateQuestion.isPending}
+                                  >
+                                    <IconTrash className="h-4 w-4 mr-1" />
+                                    Delete
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                              <div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {(["A", "B", "C", "D"] as const).map(
+                                    (option) => (
+                                      <div
+                                        key={option}
+                                        className={`p-4 rounded-xl border-2 transition-all ${
+                                          question.correctOption === option
+                                            ? "border-green-500 bg-green-50 dark:bg-green-950/30 shadow-sm"
+                                            : "border-border hover:border-border/60"
+                                        }`}
+                                      >
+                                        <div className="flex items-start gap-3">
+                                          <div
+                                            className={`flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm ${
+                                              question.correctOption === option
+                                                ? "bg-green-500 text-white"
+                                                : "bg-muted text-muted-foreground"
+                                            }`}
+                                          >
+                                            {option}
+                                          </div>
+                                          <span className="flex-1 text-base pt-0.5">
+                                            {question[`option${option}`]}
+                                          </span>
+                                          {question.correctOption ===
+                                            option && (
+                                            <IconCheck className="h-5 w-5 text-green-600 shrink-0 mt-1" />
+                                          )}
+                                        </div>
+                                      </div>
+                                    ),
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Navigation Buttons */}
+                              <div className="flex items-center justify-between pt-4 border-t">
+                                <Button
+                                  variant="outline"
+                                  onClick={() =>
+                                    setSelectedQuestionIndex((prev) =>
+                                      prev > 0 ? prev - 1 : prev,
+                                    )
+                                  }
+                                  disabled={selectedQuestionIndex === 0}
+                                >
+                                  <IconChevronUp className="h-4 w-4 mr-1 rotate-[-90deg]" />
+                                  Previous
+                                </Button>
+                                <span className="text-sm text-muted-foreground">
+                                  {selectedQuestionIndex + 1} of{" "}
+                                  {quiz.questions.length}
+                                </span>
+                                <Button
+                                  variant="outline"
+                                  onClick={() =>
+                                    setSelectedQuestionIndex((prev) =>
+                                      prev < quiz.questions!.length - 1
+                                        ? prev + 1
+                                        : prev,
+                                    )
+                                  }
+                                  disabled={
+                                    selectedQuestionIndex ===
+                                    quiz.questions.length - 1
+                                  }
+                                >
+                                  Next
+                                  <IconChevronDown className="h-4 w-4 ml-1 rotate-[-90deg]" />
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            )}
+          </>
         ) : (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
