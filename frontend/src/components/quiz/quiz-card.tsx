@@ -200,7 +200,7 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
       <Dialog open={goLiveModalOpen} onOpenChange={setGoLiveModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Start Quiz Live</DialogTitle>
+            <DialogTitle>Go Live</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -240,7 +240,7 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
                 <IconAlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
-                    Cannot undo after starting
+                    Cannot undo after going live
                   </p>
                   <p className="text-xs text-amber-800 dark:text-amber-300">
                     Questions and quiz mode cannot be changed once live
@@ -259,7 +259,7 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
               onClick={handleConfirmGoLive}
             >
               <IconPlayerPlay className="h-4 w-4 mr-2" />
-              Start Quiz
+              Go Live
             </Button>
           </DialogFooter>
         </DialogContent>
