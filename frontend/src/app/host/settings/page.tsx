@@ -76,6 +76,12 @@ export default function SettingsPage() {
     },
   });
 
+  // Check if profile form has changes
+  const profileValues = profileForm.watch();
+  const hasProfileChanges =
+    profileValues.name !== (user?.name || "") ||
+    profileValues.email !== (user?.email || "");
+
   const onUpdateProfile = async (data: ProfileFormValues) => {
     setIsUpdatingProfile(true);
     try {
@@ -123,7 +129,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl">
+    <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
         <p className="text-muted-foreground mt-1">
@@ -131,144 +137,146 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      {/* Profile Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <IconUser className="h-5 w-5" />
-            Profile Information
-          </CardTitle>
-          <CardDescription>
-            Update your personal information and email address
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={profileForm.handleSubmit(onUpdateProfile)}
-            className="space-y-4"
-          >
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                className="h-11 rounded-xl"
-                {...profileForm.register("name")}
-              />
-              {profileForm.formState.errors.name && (
-                <p className="text-sm text-destructive">
-                  {profileForm.formState.errors.name.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                className="h-11 rounded-xl"
-                {...profileForm.register("email")}
-              />
-              {profileForm.formState.errors.email && (
-                <p className="text-sm text-destructive">
-                  {profileForm.formState.errors.email.message}
-                </p>
-              )}
-            </div>
-
-            <Button
-              type="submit"
-              disabled={isUpdatingProfile}
-              size="lg"
-              className="rounded-xl"
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Profile Settings */}
+        <Card className="bg-white dark:bg-gray-500/10">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <IconUser className="h-5 w-5" />
+              Profile Information
+            </CardTitle>
+            <CardDescription>
+              Update your personal information and email address
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form
+              onSubmit={profileForm.handleSubmit(onUpdateProfile)}
+              className="space-y-4"
             >
-              {isUpdatingProfile && (
-                <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Save Changes
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  className="h-11 rounded-xl"
+                  {...profileForm.register("name")}
+                />
+                {profileForm.formState.errors.name && (
+                  <p className="text-sm text-destructive">
+                    {profileForm.formState.errors.name.message}
+                  </p>
+                )}
+              </div>
 
-      {/* Password Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <IconLock className="h-5 w-5" />
-            Change Password
-          </CardTitle>
-          <CardDescription>
-            Update your password to keep your account secure
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={passwordForm.handleSubmit(onUpdatePassword)}
-            className="space-y-4"
-          >
-            <div className="space-y-2">
-              <Label htmlFor="currentPassword">Current Password</Label>
-              <Input
-                id="currentPassword"
-                type="password"
-                className="h-11 rounded-xl"
-                {...passwordForm.register("currentPassword")}
-              />
-              {passwordForm.formState.errors.currentPassword && (
-                <p className="text-sm text-destructive">
-                  {passwordForm.formState.errors.currentPassword.message}
-                </p>
-              )}
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  className="h-11 rounded-xl"
+                  {...profileForm.register("email")}
+                />
+                {profileForm.formState.errors.email && (
+                  <p className="text-sm text-destructive">
+                    {profileForm.formState.errors.email.message}
+                  </p>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                className="h-11 rounded-xl"
-                {...passwordForm.register("newPassword")}
-              />
-              {passwordForm.formState.errors.newPassword && (
-                <p className="text-sm text-destructive">
-                  {passwordForm.formState.errors.newPassword.message}
-                </p>
-              )}
-            </div>
+              <Button
+                type="submit"
+                disabled={isUpdatingProfile || !hasProfileChanges}
+                size="lg"
+                className="rounded-xl w-full"
+              >
+                {isUpdatingProfile && (
+                  <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Save Changes
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                className="h-11 rounded-xl"
-                {...passwordForm.register("confirmPassword")}
-              />
-              {passwordForm.formState.errors.confirmPassword && (
-                <p className="text-sm text-destructive">
-                  {passwordForm.formState.errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-
-            <Button
-              type="submit"
-              disabled={isUpdatingPassword}
-              size="lg"
-              className="rounded-xl"
+        {/* Password Settings */}
+        <Card className="bg-white dark:bg-gray-500/10">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <IconLock className="h-5 w-5" />
+              Change Password
+            </CardTitle>
+            <CardDescription>
+              Update your password to keep your account secure
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form
+              onSubmit={passwordForm.handleSubmit(onUpdatePassword)}
+              className="space-y-4"
             >
-              {isUpdatingPassword && (
-                <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Update Password
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">Current Password</Label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  className="h-11 rounded-xl"
+                  {...passwordForm.register("currentPassword")}
+                />
+                {passwordForm.formState.errors.currentPassword && (
+                  <p className="text-sm text-destructive">
+                    {passwordForm.formState.errors.currentPassword.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">New Password</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  className="h-11 rounded-xl"
+                  {...passwordForm.register("newPassword")}
+                />
+                {passwordForm.formState.errors.newPassword && (
+                  <p className="text-sm text-destructive">
+                    {passwordForm.formState.errors.newPassword.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  className="h-11 rounded-xl"
+                  {...passwordForm.register("confirmPassword")}
+                />
+                {passwordForm.formState.errors.confirmPassword && (
+                  <p className="text-sm text-destructive">
+                    {passwordForm.formState.errors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isUpdatingPassword}
+                size="lg"
+                className="rounded-xl w-full"
+              >
+                {isUpdatingPassword && (
+                  <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Update Password
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Notification Settings */}
-      <Card>
+      <Card className="bg-white dark:bg-gray-500/10">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <IconBell className="h-5 w-5" />

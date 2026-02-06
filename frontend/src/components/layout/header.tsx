@@ -102,7 +102,7 @@ export function Header() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
-                    href="/host/dashboard"
+                    href="/host/quizzes"
                     className="cursor-pointer rounded-lg"
                   >
                     <IconLayoutDashboard className="mr-2 h-4 w-4" />
@@ -174,7 +174,7 @@ export function Header() {
                   <DropdownMenuSeparator className="my-2" />
                   <DropdownMenuItem asChild>
                     <Link
-                      href="/host/dashboard"
+                      href="/host/quizzes"
                       className="cursor-pointer rounded-lg"
                     >
                       <IconLayoutDashboard className="mr-2 h-4 w-4" />

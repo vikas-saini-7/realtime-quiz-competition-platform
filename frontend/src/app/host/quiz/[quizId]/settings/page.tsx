@@ -110,7 +110,7 @@ export default function QuizSettingsPage() {
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <p className="text-muted-foreground">Quiz not found</p>
         <Button asChild>
-          <Link href="/host/dashboard">Back to Dashboard</Link>
+          <Link href="/host/quizzes">Back to Quizzes</Link>
         </Button>
       </div>
     );
