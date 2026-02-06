@@ -1,6 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createDatabaseConnection, Database } from './neon.client';
+import { createDatabaseConnection, Database } from './db.client';
 
 export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
 

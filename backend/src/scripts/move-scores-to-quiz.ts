@@ -1,5 +1,5 @@
-import { drizzle } from 'drizzle-orm/neon-http';
-import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
 import { config } from 'dotenv';
 import { quizzes, questions } from '../database/schema';
 import { sql } from 'drizzle-orm';
@@ -12,8 +12,8 @@ if (!connectionString) {
   throw new Error('DATABASE_URL is not defined');
 }
 
-const sqlClient = neon(connectionString);
-const db = drizzle(sqlClient);
+const pool = new Pool({ connectionString });
+const db = drizzle(pool);
 
 async function moveScoresToQuiz() {
   console.log('Starting migration: Moving scores from questions to quizzes...');
