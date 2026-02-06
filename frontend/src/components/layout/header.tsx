@@ -69,7 +69,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-background/80 dark:backdrop-blur-xl  mb-2">
+    <header className="sticky top-0 z-50 w-full bg-white dark:bg-background/80 dark:backdrop-blur-xl mb-2">
       <div className="container flex h-16 items-center justify-between px-6 max-w-[1600px] mx-auto">
         <Link
           href="/"
@@ -123,7 +123,7 @@ export function Header() {
                     variant="ghost"
                     className="flex items-center gap-3 h-10 px-3 rounded-xl"
                   >
-                    <Avatar className="h-8 w-8 ring-2 ring-border">
+                    <Avatar className="h-8 w-8">
                       <AvatarFallback className="text-xs font-semibold bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
                         {getInitials(user.name)}
                       </AvatarFallback>

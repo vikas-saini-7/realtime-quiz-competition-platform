@@ -138,7 +138,7 @@ export function CreateQuizModal({ open, onOpenChange }: CreateQuizModalProps) {
               control={form.control}
               name="isAutomatic"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-xl border p-4 space-y-0">
+                <FormItem className="flex flex-row items-center justify-between rounded-xl bg-muted/20 dark:bg-muted/10 p-4 space-y-0">
                   <div className="space-y-0.5">
                     <FormLabel className="text-sm font-semibold">
                       Automatic Mode

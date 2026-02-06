@@ -123,8 +123,13 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
       <CardFooter className="pt-0 flex gap-2 flex-wrap">
         {isHost ? (
           <>
-            {quiz.status !== "LIVE" && (
-              <Button asChild variant="outline" size="sm" className="flex-1">
+            {quiz.status !== "LIVE" && quiz.status !== "COMPLETED" && (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="flex-1 bg-gray-500/10"
+              >
                 <Link href={`/host/quiz/${quiz.id}/edit`}>
                   <IconEdit className="h-4 w-4 mr-1" />
                   Edit
@@ -235,7 +240,7 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
               </div>
             </div>
 
-            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 p-4 border border-amber-200 dark:border-amber-800">
+            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 p-4">
               <div className="flex gap-3">
                 <IconAlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
                 <div className="space-y-1">

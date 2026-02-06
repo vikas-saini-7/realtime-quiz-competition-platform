@@ -20,6 +20,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CardSkeleton } from "@/components/ui/card-skeleton";
 import { QuizStatusBadge } from "@/components/quiz/quiz-status-badge";
 import { useQuizWithQuestions, useUpdateQuiz } from "@/hooks";
@@ -98,8 +99,8 @@ export default function QuizSettingsPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <CardSkeleton className="h-10 w-64" showHeader={false} linesCount={1} />
-        <CardSkeleton className="h-64 w-full" />
+        <Skeleton className="h-12 w-full rounded-lg" />
+        <Skeleton className="h-80 w-full rounded-lg" />
       </div>
     );
   }
@@ -134,86 +135,85 @@ export default function QuizSettingsPage() {
         </div>
       </div>
 
-      <Separator />
+      <div className="flex items-center justify-end">
+        <Button
+          onClick={handleUpdateQuizSettings}
+          disabled={
+            !hasChanges ||
+            isSavingSettings ||
+            quiz.status === "LIVE" ||
+            quiz.status === "COMPLETED"
+          }
+          className="min-w-[120px]"
+        >
+          {isSavingSettings ? (
+            <IconLoader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <IconDeviceFloppy className="h-4 w-4 mr-2" />
+          )}
+          {isSavingSettings ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Quiz Settings</CardTitle>
-              <CardDescription>Manage your quiz configuration</CardDescription>
+      <div className="space-y-6">
+        {/* Basic Details Section */}
+        <Card className="bg-white dark:bg-gray-500/10">
+          <CardHeader>
+            <CardTitle>Basic Details</CardTitle>
+            <CardDescription>Update quiz title and description</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Title</label>
+                <Input
+                  value={settingsForm.title}
+                  onChange={(e) => {
+                    setSettingsForm({ ...settingsForm, title: e.target.value });
+                    setHasChanges(true);
+                  }}
+                  placeholder="Quiz title"
+                  disabled={
+                    quiz.status === "LIVE" || quiz.status === "COMPLETED"
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Quiz Code</label>
+                <Input
+                  value={quiz.code}
+                  disabled
+                  className="font-mono font-semibold bg-muted"
+                />
+              </div>
             </div>
-            <Button
-              onClick={handleUpdateQuizSettings}
-              disabled={
-                !hasChanges ||
-                isSavingSettings ||
-                quiz.status === "LIVE" ||
-                quiz.status === "COMPLETED"
-              }
-              className="min-w-[120px]"
-            >
-              {isSavingSettings ? (
-                <IconLoader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <IconDeviceFloppy className="h-4 w-4 mr-2" />
-              )}
-              {isSavingSettings ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Basic Details */}
-          <div className="grid gap-4 md:grid-cols-2">
+
             <div className="space-y-2">
-              <label className="text-sm font-medium">Title</label>
-              <Input
-                value={settingsForm.title}
+              <label className="text-sm font-medium">Description</label>
+              <Textarea
+                value={settingsForm.description}
                 onChange={(e) => {
-                  setSettingsForm({ ...settingsForm, title: e.target.value });
+                  setSettingsForm({
+                    ...settingsForm,
+                    description: e.target.value,
+                  });
                   setHasChanges(true);
                 }}
-                placeholder="Quiz title"
+                placeholder="Quiz description (optional)"
+                className="resize-none min-h-[80px]"
                 disabled={quiz.status === "LIVE" || quiz.status === "COMPLETED"}
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Quiz Code</label>
-              <Input
-                value={quiz.code}
-                disabled
-                className="font-mono font-semibold bg-muted"
-              />
-            </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Description</label>
-            <Textarea
-              value={settingsForm.description}
-              onChange={(e) => {
-                setSettingsForm({
-                  ...settingsForm,
-                  description: e.target.value,
-                });
-                setHasChanges(true);
-              }}
-              placeholder="Quiz description (optional)"
-              className="resize-none min-h-[80px]"
-              disabled={quiz.status === "LIVE" || quiz.status === "COMPLETED"}
-            />
-          </div>
-
-          <Separator />
-
-          {/* Quiz Behavior */}
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-semibold mb-1">Quiz Behavior</h3>
-              <p className="text-xs text-muted-foreground">
-                Control progression mode
-              </p>
-            </div>
+        {/* Quiz Behavior Section */}
+        <Card className="bg-white dark:bg-gray-500/10">
+          <CardHeader>
+            <CardTitle>Quiz Behavior</CardTitle>
+            <CardDescription>Control progression mode</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="flex items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
                 <label className="text-sm font-medium">Automatic Mode</label>
@@ -241,18 +241,18 @@ export default function QuizSettingsPage() {
                 ⚠️ Cannot change settings after quiz has started
               </p>
             )}
-          </div>
+          </CardContent>
+        </Card>
 
-          <Separator />
-
-          {/* Scoring Configuration */}
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-semibold mb-1">Scoring System</h3>
-              <p className="text-xs text-muted-foreground">
-                Configure points for correct and incorrect answers
-              </p>
-            </div>
+        {/* Scoring Configuration Section */}
+        <Card className="bg-white dark:bg-gray-500/10">
+          <CardHeader>
+            <CardTitle>Scoring System</CardTitle>
+            <CardDescription>
+              Configure points for correct and incorrect answers
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Base Score</label>
@@ -299,15 +299,18 @@ export default function QuizSettingsPage() {
                 </p>
               </div>
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          <Separator />
-
-          {/* Schedule and Statistics */}
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Schedule */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Schedule</label>
+        {/* Schedule and Statistics Section */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Schedule */}
+          <Card className="bg-white dark:bg-gray-500/10">
+            <CardHeader>
+              <CardTitle>Schedule</CardTitle>
+              <CardDescription>Set when quiz becomes available</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2">
               <Input
                 type="datetime-local"
                 value={settingsForm.scheduledAt}
@@ -321,14 +324,19 @@ export default function QuizSettingsPage() {
                 disabled={quiz.status === "LIVE" || quiz.status === "COMPLETED"}
               />
               <p className="text-xs text-muted-foreground">
-                Optional: Set when quiz becomes available
+                Optional: Leave empty for immediate availability
               </p>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Quiz Info */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Quiz Info</label>
-              <div className="rounded-lg border p-3 space-y-2">
+          {/* Quiz Info */}
+          <Card className="bg-white dark:bg-gray-500/10">
+            <CardHeader>
+              <CardTitle>Quiz Information</CardTitle>
+              <CardDescription>Overview of quiz details</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Questions</span>
                   <span className="font-semibold">
@@ -344,10 +352,10 @@ export default function QuizSettingsPage() {
                   <span>{new Date(quiz.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

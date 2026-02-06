@@ -19,11 +19,11 @@ export default function HostLayout({
   }
 
   return (
-    <div className="flex h-screen flex-col dark:bg-secondary/30 bg-gray-500/10">
+    <div className="flex h-screen flex-col ">
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 p-8 overflow-y-auto rounded-tl-xl bg-background">
+        <main className="flex-1 p-8 overflow-y-auto rounded-tl-xl bg-gray-500/10 dark:bg-gray-500/10">
           {children}
         </main>
       </div>

@@ -76,7 +76,7 @@ export function ShareQuizModal({
       <DialogContent className="sm:max-w-[420px]">
         <div className="flex flex-col items-center space-y-6 py-6">
           {/* QR Code */}
-          <div className="bg-white p-6 rounded-2xl border border-black/10">
+          <div className="bg-white p-6 rounded-2xl">
             <QRCodeSVG
               value={joinUrl}
               size={180}
@@ -87,7 +87,7 @@ export function ShareQuizModal({
 
           {/* Quiz Code */}
           <div className="text-center space-y-3">
-            <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-xl px-10 py-5">
+            <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl px-10 py-5">
               <span className="text-3xl font-bold tracking-[0.5em] text-primary">
                 {quiz.code}
               </span>

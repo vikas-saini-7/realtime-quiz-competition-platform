@@ -182,15 +182,13 @@ export function PreviewQuizModal({
                         onClick={() => handleSelectOption(option)}
                         disabled={showAnswer}
                         className={cn(
-                          "w-full p-4 rounded-xl border-2 text-left transition-all",
-                          "hover:border-primary hover:bg-primary/5",
+                          "w-full p-4 rounded-xl text-left transition-all",
+                          "hover:bg-primary/5",
                           selectedOption === option &&
                             !showAnswer &&
-                            "border-primary bg-primary/5",
-                          result === true &&
-                            "border-green-500 bg-green-50 dark:bg-green-950/30",
-                          result === false &&
-                            "border-red-500 bg-red-50 dark:bg-red-950/30",
+                            "bg-primary/5",
+                          result === true && "bg-green-50 dark:bg-green-950/30",
+                          result === false && "bg-red-50 dark:bg-red-950/30",
                           showAnswer && result === null && "opacity-50",
                         )}
                       >

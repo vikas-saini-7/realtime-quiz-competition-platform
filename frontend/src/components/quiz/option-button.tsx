@@ -58,7 +58,7 @@ export function OptionButton({
       className={cn(
         "w-full flex items-center gap-4 p-4 rounded-lg border transition-all text-left",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        isSelected && !showResult && "ring-2 ring-primary ring-offset-2",
+        isSelected && !showResult && "bg-primary/20",
         !isSelected && !showResult && colors.border,
         getResultStyles(),
       )}

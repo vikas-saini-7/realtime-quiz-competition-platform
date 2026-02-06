@@ -48,7 +48,7 @@ export default function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section className="container max-w-7xl mx-auto py-20 border-t">
+        <section className="container max-w-7xl mx-auto py-20 bg-muted/10 dark:bg-muted/5">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Everything you need for{" "}
@@ -61,7 +61,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="group flex flex-col items-center text-center gap-4 p-8 rounded-2xl border bg-card hover:shadow-lg transition-all hover:border-primary/50">
+            <div className="group flex flex-col items-center text-center gap-4 p-8 rounded-2xl bg-card hover:shadow-lg transition-all">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                 <IconBrain className="h-7 w-7 text-primary" />
               </div>
@@ -72,7 +72,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="group flex flex-col items-center text-center gap-4 p-8 rounded-2xl border bg-card hover:shadow-lg transition-all hover:border-primary/50">
+            <div className="group flex flex-col items-center text-center gap-4 p-8 rounded-2xl bg-card hover:shadow-lg transition-all">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                 <IconUsers className="h-7 w-7 text-primary" />
               </div>
@@ -83,7 +83,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="group flex flex-col items-center text-center gap-4 p-8 rounded-2xl border bg-card hover:shadow-lg transition-all hover:border-primary/50">
+            <div className="group flex flex-col items-center text-center gap-4 p-8 rounded-2xl bg-card hover:shadow-lg transition-all">
               <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                 <IconDeviceGamepad2 className="h-7 w-7 text-primary" />
               </div>
@@ -97,10 +97,10 @@ export default function HomePage() {
         </section>
 
         {/* CTA Section */}
-        <section className="container max-w-7xl mx-auto py-24 border-t">
-          <div className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/5 via-primary/3 to-transparent p-12 md:p-16">
+        <section className="container max-w-7xl mx-auto py-24 bg-muted/10 dark:bg-muted/5">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 via-primary/3 to-transparent p-12 md:p-16">
             <div className="relative z-10 flex flex-col items-center text-center gap-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10">
                 <IconBolt className="h-4 w-4 text-primary" />
                 <span className="text-sm font-semibold text-primary">
                   Start for Free

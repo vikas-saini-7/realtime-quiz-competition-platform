@@ -73,8 +73,8 @@ export default function HostDashboardPage() {
 
       {isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => (
-            <CardSkeleton key={i} className="h-56" />
+          {[...Array(3)].map((_, i) => (
+            <CardSkeleton key={i} className="h-56" showHeader={false} />
           ))}
         </div>
       ) : quizzes && quizzes.length > 0 ? (
@@ -90,7 +90,7 @@ export default function HostDashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center min-h-[500px] gap-6 rounded-3xl border-2 border-dashed">
+        <div className="flex flex-col items-center justify-center min-h-[500px] gap-6 rounded-3xl bg-muted/20 dark:bg-muted/10">
           <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-muted">
             <IconBrain className="h-10 w-10 text-muted-foreground" />
           </div>

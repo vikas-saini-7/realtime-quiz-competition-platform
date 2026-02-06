@@ -328,7 +328,7 @@ export default function SettingsPage() {
       </Card>
 
       {/* Danger Zone */}
-      <Card className="border-destructive/50">
+      <Card className="bg-destructive/5">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-destructive">
             <IconShield className="h-5 w-5" />
@@ -340,7 +340,7 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="rounded-xl border border-destructive/50 bg-destructive/5 p-4">
+            <div className="rounded-xl bg-destructive/10 p-4">
               <div className="space-y-2">
                 <h3 className="font-semibold text-destructive">
                   Delete Account

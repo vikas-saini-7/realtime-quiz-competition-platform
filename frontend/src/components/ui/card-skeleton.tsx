@@ -11,22 +11,18 @@ interface CardSkeletonProps {
 export function CardSkeleton({
   className,
   showHeader = true,
-  linesCount = 3,
+  linesCount = 2,
 }: CardSkeletonProps) {
   return (
-    <Card className={cn("rounded-2xl", className)}>
+    <Card className={cn("rounded-2xl bg-muted/20 dark:bg-muted/10", className)}>
       {showHeader && (
         <CardHeader>
-          <Skeleton className="h-5 w-3/4" />
-          <Skeleton className="h-4 w-1/2 mt-2" />
+          <Skeleton className="h-4 w-3/4" />
         </CardHeader>
       )}
-      <CardContent className={cn("space-y-3", !showHeader && "pt-6")}>
+      <CardContent className={cn("space-y-2", !showHeader && "pt-6")}>
         {Array.from({ length: linesCount }).map((_, i) => (
-          <Skeleton
-            key={i}
-            className={cn("h-4", i === linesCount - 1 ? "w-2/3" : "w-full")}
-          />
+          <Skeleton key={i} className="h-3 w-full" />
         ))}
       </CardContent>
     </Card>

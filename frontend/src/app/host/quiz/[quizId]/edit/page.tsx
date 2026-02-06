@@ -81,6 +81,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CardSkeleton } from "@/components/ui/card-skeleton";
 import { QuizStatusBadge } from "@/components/quiz/quiz-status-badge";
 import { AddQuestionModal } from "@/components/quiz/add-question-modal";
@@ -140,8 +141,8 @@ function SortableQuestionBox({
         isDragging
           ? "opacity-50 scale-95"
           : isSelected
-            ? "bg-primary text-primary-foreground shadow-md scale-105"
-            : "bg-background border-2 hover:border-primary/50 hover:scale-105"
+            ? "bg-primary text-primary-foreground scale-105"
+            : "bg-gray-100 dark:bg-muted/20 hover:bg-primary/20 hover:scale-105"
       }`}
     >
       {/* Drag Handle */}
@@ -200,7 +201,7 @@ function QuestionCard({
       <Card
         ref={setNodeRef}
         style={style}
-        className="overflow-hidden rounded-xl border-2"
+        className="overflow-hidden rounded-xl bg-white dark:bg-gray-500/10"
       >
         <CardHeader className="py-4 px-5">
           <div className="flex items-center justify-between gap-4">
@@ -224,6 +225,7 @@ function QuestionCard({
                 variant="outline"
                 size="sm"
                 onClick={onEdit}
+                className="bg-gray-500/10"
               >
                 <IconEdit className="h-4 w-4 mr-1" />
                 Edit
@@ -233,6 +235,7 @@ function QuestionCard({
                 variant="outline"
                 size="sm"
                 onClick={onDelete}
+                className="bg-gray-500/10"
               >
                 <IconTrash className="h-4 w-4 mr-1" />
                 Delete
@@ -260,10 +263,10 @@ function QuestionCard({
                 {(["A", "B", "C", "D"] as const).map((option) => (
                   <div
                     key={option}
-                    className={`p-4 rounded-xl border-2 transition-all ${
+                    className={`p-4 rounded-xl transition-all ${
                       question.correctOption === option
-                        ? "border-green-500 bg-green-50 dark:bg-green-950/30 shadow-sm"
-                        : "border-border hover:border-border/60"
+                        ? "bg-green-50 dark:bg-green-950/30"
+                        : "bg-gray-500/10 hover:bg-gray-500/15"
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -435,9 +438,8 @@ export default function EditQuizPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <CardSkeleton className="h-10 w-64" showHeader={false} linesCount={1} />
-        <CardSkeleton className="h-48 w-full" />
-        <CardSkeleton className="h-64 w-full" />
+        <Skeleton className="h-12 w-full rounded-lg" />
+        <Skeleton className="h-96 w-full rounded-lg" />
       </div>
     );
   }
@@ -505,7 +507,7 @@ export default function EditQuizPage() {
       <Separator />
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between bg-muted/50 p-4 rounded-lg">
+        <div className="flex items-center justify-between p-4 rounded-lg">
           <div>
             <h2 className="text-xl font-semibold">Questions</h2>
             <p className="text-sm text-muted-foreground mt-1">
@@ -515,12 +517,12 @@ export default function EditQuizPage() {
           </div>
           <div className="flex items-center gap-2">
             {quiz.questions && quiz.questions.length > 0 && (
-              <div className="flex items-center gap-1 bg-background border rounded-lg p-1">
+              <div className="flex items-center gap-1 rounded-lg p-1 bg-white dark:bg-gray-500/10">
                 <Button
                   variant={viewMode === "list" ? "secondary" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("list")}
-                  className="h-8 px-3"
+                  className={`h-8 px-3 ${viewMode === "list" ? "bg-gray-500/10" : ""}`}
                 >
                   <IconLayoutList className="h-4 w-4 mr-1" />
                   List
@@ -529,7 +531,7 @@ export default function EditQuizPage() {
                   variant={viewMode === "card" ? "secondary" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("card")}
-                  className="h-8 px-3"
+                  className={`h-8 px-3 ${viewMode === "card" ? "bg-gray-500/10" : ""}`}
                 >
                   <IconLayoutGrid className="h-4 w-4 mr-1" />
                   Card
@@ -583,7 +585,7 @@ export default function EditQuizPage() {
                 >
                   <div className="space-y-4">
                     {/* Question Navigation Boxes */}
-                    <div className="flex flex-wrap gap-2 p-4 bg-muted/30 rounded-lg border">
+                    <div className="flex flex-wrap gap-2">
                       {quiz.questions
                         .sort((a, b) => a.orderIndex - b.orderIndex)
                         .map((question, index) => (
@@ -604,7 +606,10 @@ export default function EditQuizPage() {
                         if (index !== selectedQuestionIndex) return null;
 
                         return (
-                          <Card key={question.id} className="border-2">
+                          <Card
+                            key={question.id}
+                            className="bg-white dark:bg-gray-500/10"
+                          >
                             <CardHeader className="pb-4">
                               <div className="flex items-center justify-between gap-4">
                                 <CardTitle className="text-lg truncate flex-1">
@@ -617,6 +622,7 @@ export default function EditQuizPage() {
                                     onClick={() =>
                                       handleEditQuestionClick(question)
                                     }
+                                    className="bg-gray-500/10"
                                   >
                                     <IconEdit className="h-4 w-4 mr-1" />
                                     Edit
@@ -628,6 +634,7 @@ export default function EditQuizPage() {
                                       handleDeleteQuestion(question.id)
                                     }
                                     disabled={updateQuestion.isPending}
+                                    className="bg-gray-500/10"
                                   >
                                     <IconTrash className="h-4 w-4 mr-1" />
                                     Delete
@@ -642,10 +649,10 @@ export default function EditQuizPage() {
                                     (option) => (
                                       <div
                                         key={option}
-                                        className={`p-4 rounded-xl border-2 transition-all ${
+                                        className={`p-4 rounded-xl transition-all ${
                                           question.correctOption === option
-                                            ? "border-green-500 bg-green-50 dark:bg-green-950/30 shadow-sm"
-                                            : "border-border hover:border-border/60"
+                                            ? "bg-green-50 dark:bg-green-950/30"
+                                            : "bg-gray-500/10 hover:bg-gray-500/15"
                                         }`}
                                       >
                                         <div className="flex items-start gap-3">
@@ -673,7 +680,7 @@ export default function EditQuizPage() {
                               </div>
 
                               {/* Navigation Buttons */}
-                              <div className="flex items-center justify-between pt-4 border-t">
+                              <div className="flex items-center justify-between pt-4">
                                 <Button
                                   variant="outline"
                                   onClick={() =>

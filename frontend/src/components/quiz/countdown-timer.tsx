@@ -46,8 +46,8 @@ export function CountdownTimer({
       <div className="flex flex-col items-center justify-center">
         <div
           className={cn(
-            "relative flex items-center justify-center w-20 h-20 rounded-full border transition-colors",
-            isLow ? "border-red-500" : "border-primary",
+            "relative flex items-center justify-center w-20 h-20 rounded-full transition-colors",
+            isLow ? "bg-red-500/10" : "bg-primary/10",
           )}
         >
           <svg className="absolute inset-0 w-full h-full -rotate-90">

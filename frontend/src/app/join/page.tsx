@@ -104,7 +104,7 @@ export default function JoinPage() {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={handlePaste}
-              className="w-20 h-20 text-center text-3xl font-semibold border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all uppercase bg-background shadow-sm hover:shadow-md"
+              className="w-20 h-20 text-center text-3xl font-semibold border border-gray-300 dark:border-gray-800 rounded-xl outline-none transition-all uppercase bg-muted/30 dark:bg-muted/20"
               placeholder=""
               autoComplete="off"
             />
@@ -126,7 +126,7 @@ export default function JoinPage() {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={handlePaste}
-              className="w-20 h-20 text-center text-3xl font-semibold border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all uppercase bg-background shadow-sm hover:shadow-md"
+              className="w-20 h-20 text-center text-3xl font-semibold border border-gray-300 dark:border-gray-800 rounded-xl outline-none transition-all uppercase bg-muted/30 dark:bg-muted/20"
               placeholder=""
               autoComplete="off"
             />
