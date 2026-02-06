@@ -74,8 +74,11 @@ export class QuizzesService {
   }
 
   async findAll(): Promise<Quiz[]> {
-    const result = await this.db.select().from(quizzes).orderBy(desc(quizzes.createdAt));
-    
+    const result = await this.db
+      .select()
+      .from(quizzes)
+      .orderBy(desc(quizzes.createdAt));
+
     // Add question count for each quiz
     const quizzesWithCount = await Promise.all(
       result.map(async (quiz) => {
@@ -89,7 +92,7 @@ export class QuizzesService {
         };
       }),
     );
-    
+
     return quizzesWithCount;
   }
 
@@ -99,7 +102,7 @@ export class QuizzesService {
       .from(quizzes)
       .where(eq(quizzes.hostId, hostId))
       .orderBy(desc(quizzes.createdAt));
-    
+
     // Add question count for each quiz
     const quizzesWithCount = await Promise.all(
       result.map(async (quiz) => {
@@ -113,7 +116,7 @@ export class QuizzesService {
         };
       }),
     );
-    
+
     return quizzesWithCount;
   }
 

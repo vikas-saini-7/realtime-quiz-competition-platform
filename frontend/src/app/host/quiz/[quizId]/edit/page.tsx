@@ -490,8 +490,8 @@ export default function EditQuizPage() {
             </Link>
           </Button>
           {(quiz.status === "DRAFT" || quiz.status === "SCHEDULED") && (
-            <Button 
-              onClick={handleGoLive} 
+            <Button
+              onClick={handleGoLive}
               disabled={updateQuiz.isPending}
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
@@ -505,240 +505,239 @@ export default function EditQuizPage() {
       <Separator />
 
       <div className="space-y-4">
-          <div className="flex items-center justify-between bg-muted/50 p-4 rounded-lg">
-            <div>
-              <h2 className="text-xl font-semibold">Questions</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {quiz.questions?.length || 0} question
-                {quiz.questions?.length !== 1 ? "s" : ""} created
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {quiz.questions && quiz.questions.length > 0 && (
-                <div className="flex items-center gap-1 bg-background border rounded-lg p-1">
-                  <Button
-                    variant={viewMode === "list" ? "secondary" : "ghost"}
-                    size="sm"
-                    onClick={() => setViewMode("list")}
-                    className="h-8 px-3"
-                  >
-                    <IconLayoutList className="h-4 w-4 mr-1" />
-                    List
-                  </Button>
-                  <Button
-                    variant={viewMode === "card" ? "secondary" : "ghost"}
-                    size="sm"
-                    onClick={() => setViewMode("card")}
-                    className="h-8 px-3"
-                  >
-                    <IconLayoutGrid className="h-4 w-4 mr-1" />
-                    Card
-                  </Button>
-                </div>
-              )}
-              <Button onClick={() => setAddQuestionModalOpen(true)}>
-                <IconPlus className="h-4 w-4 mr-2" />
-                Add Question
-              </Button>
-            </div>
+        <div className="flex items-center justify-between bg-muted/50 p-4 rounded-lg">
+          <div>
+            <h2 className="text-xl font-semibold">Questions</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              {quiz.questions?.length || 0} question
+              {quiz.questions?.length !== 1 ? "s" : ""} created
+            </p>
           </div>
-
-          {quiz.questions && quiz.questions.length > 0 ? (
-            <>
-              {viewMode === "list" ? (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
+          <div className="flex items-center gap-2">
+            {quiz.questions && quiz.questions.length > 0 && (
+              <div className="flex items-center gap-1 bg-background border rounded-lg p-1">
+                <Button
+                  variant={viewMode === "list" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                  className="h-8 px-3"
                 >
-                  <SortableContext
-                    items={quiz.questions.map((q) => q.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <div className="space-y-3">
+                  <IconLayoutList className="h-4 w-4 mr-1" />
+                  List
+                </Button>
+                <Button
+                  variant={viewMode === "card" ? "secondary" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("card")}
+                  className="h-8 px-3"
+                >
+                  <IconLayoutGrid className="h-4 w-4 mr-1" />
+                  Card
+                </Button>
+              </div>
+            )}
+            <Button onClick={() => setAddQuestionModalOpen(true)}>
+              <IconPlus className="h-4 w-4 mr-2" />
+              Add Question
+            </Button>
+          </div>
+        </div>
+
+        {quiz.questions && quiz.questions.length > 0 ? (
+          <>
+            {viewMode === "list" ? (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={quiz.questions.map((q) => q.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-3">
+                    {quiz.questions
+                      .sort((a, b) => a.orderIndex - b.orderIndex)
+                      .map((question, index) => (
+                        <QuestionCard
+                          key={question.id}
+                          question={question}
+                          index={index}
+                          onEdit={() => handleEditQuestionClick(question)}
+                          onDelete={() => handleDeleteQuestion(question.id)}
+                          isUpdating={updateQuestion.isPending}
+                        />
+                      ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            ) : (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={quiz.questions.map((q) => q.id)}
+                  strategy={horizontalListSortingStrategy}
+                >
+                  <div className="space-y-4">
+                    {/* Question Navigation Boxes */}
+                    <div className="flex flex-wrap gap-2 p-4 bg-muted/30 rounded-lg border">
                       {quiz.questions
                         .sort((a, b) => a.orderIndex - b.orderIndex)
                         .map((question, index) => (
-                          <QuestionCard
+                          <SortableQuestionBox
                             key={question.id}
-                            question={question}
+                            questionId={question.id}
                             index={index}
-                            onEdit={() => handleEditQuestionClick(question)}
-                            onDelete={() => handleDeleteQuestion(question.id)}
-                            isUpdating={updateQuestion.isPending}
+                            isSelected={selectedQuestionIndex === index}
+                            onClick={() => setSelectedQuestionIndex(index)}
                           />
                         ))}
                     </div>
-                  </SortableContext>
-                </DndContext>
-              ) : (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={quiz.questions.map((q) => q.id)}
-                    strategy={horizontalListSortingStrategy}
-                  >
-                    <div className="space-y-4">
-                      {/* Question Navigation Boxes */}
-                      <div className="flex flex-wrap gap-2 p-4 bg-muted/30 rounded-lg border">
-                        {quiz.questions
-                          .sort((a, b) => a.orderIndex - b.orderIndex)
-                          .map((question, index) => (
-                            <SortableQuestionBox
-                              key={question.id}
-                              questionId={question.id}
-                              index={index}
-                              isSelected={selectedQuestionIndex === index}
-                              onClick={() => setSelectedQuestionIndex(index)}
-                            />
-                          ))}
-                      </div>
 
-                      {/* Selected Question Display */}
-                      {quiz.questions
-                        .sort((a, b) => a.orderIndex - b.orderIndex)
-                        .map((question, index) => {
-                          if (index !== selectedQuestionIndex) return null;
+                    {/* Selected Question Display */}
+                    {quiz.questions
+                      .sort((a, b) => a.orderIndex - b.orderIndex)
+                      .map((question, index) => {
+                        if (index !== selectedQuestionIndex) return null;
 
-                          return (
-                            <Card key={question.id} className="border-2">
-                              <CardHeader className="pb-4">
-                                <div className="flex items-center justify-between gap-4">
-                                  <CardTitle className="text-lg truncate flex-1">
-                                    {question.questionText}
-                                  </CardTitle>
-                                  <div className="flex items-center gap-2">
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() =>
-                                        handleEditQuestionClick(question)
-                                      }
-                                    >
-                                      <IconEdit className="h-4 w-4 mr-1" />
-                                      Edit
-                                    </Button>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() =>
-                                        handleDeleteQuestion(question.id)
-                                      }
-                                      disabled={updateQuestion.isPending}
-                                    >
-                                      <IconTrash className="h-4 w-4 mr-1" />
-                                      Delete
-                                    </Button>
-                                  </div>
+                        return (
+                          <Card key={question.id} className="border-2">
+                            <CardHeader className="pb-4">
+                              <div className="flex items-center justify-between gap-4">
+                                <CardTitle className="text-lg truncate flex-1">
+                                  {question.questionText}
+                                </CardTitle>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleEditQuestionClick(question)
+                                    }
+                                  >
+                                    <IconEdit className="h-4 w-4 mr-1" />
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleDeleteQuestion(question.id)
+                                    }
+                                    disabled={updateQuestion.isPending}
+                                  >
+                                    <IconTrash className="h-4 w-4 mr-1" />
+                                    Delete
+                                  </Button>
                                 </div>
-                              </CardHeader>
-                              <CardContent className="space-y-6">
-                                <div>
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {(["A", "B", "C", "D"] as const).map(
-                                      (option) => (
-                                        <div
-                                          key={option}
-                                          className={`p-4 rounded-xl border-2 transition-all ${
-                                            question.correctOption === option
-                                              ? "border-green-500 bg-green-50 dark:bg-green-950/30 shadow-sm"
-                                              : "border-border hover:border-border/60"
-                                          }`}
-                                        >
-                                          <div className="flex items-start gap-3">
-                                            <div
-                                              className={`flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm ${
-                                                question.correctOption ===
-                                                option
-                                                  ? "bg-green-500 text-white"
-                                                  : "bg-muted text-muted-foreground"
-                                              }`}
-                                            >
-                                              {option}
-                                            </div>
-                                            <span className="flex-1 text-base pt-0.5">
-                                              {question[`option${option}`]}
-                                            </span>
-                                            {question.correctOption ===
-                                              option && (
-                                              <IconCheck className="h-5 w-5 text-green-600 shrink-0 mt-1" />
-                                            )}
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                              <div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {(["A", "B", "C", "D"] as const).map(
+                                    (option) => (
+                                      <div
+                                        key={option}
+                                        className={`p-4 rounded-xl border-2 transition-all ${
+                                          question.correctOption === option
+                                            ? "border-green-500 bg-green-50 dark:bg-green-950/30 shadow-sm"
+                                            : "border-border hover:border-border/60"
+                                        }`}
+                                      >
+                                        <div className="flex items-start gap-3">
+                                          <div
+                                            className={`flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm ${
+                                              question.correctOption === option
+                                                ? "bg-green-500 text-white"
+                                                : "bg-muted text-muted-foreground"
+                                            }`}
+                                          >
+                                            {option}
                                           </div>
+                                          <span className="flex-1 text-base pt-0.5">
+                                            {question[`option${option}`]}
+                                          </span>
+                                          {question.correctOption ===
+                                            option && (
+                                            <IconCheck className="h-5 w-5 text-green-600 shrink-0 mt-1" />
+                                          )}
                                         </div>
-                                      ),
-                                    )}
-                                  </div>
+                                      </div>
+                                    ),
+                                  )}
                                 </div>
+                              </div>
 
-                                {/* Navigation Buttons */}
-                                <div className="flex items-center justify-between pt-4 border-t">
-                                  <Button
-                                    variant="outline"
-                                    onClick={() =>
-                                      setSelectedQuestionIndex((prev) =>
-                                        prev > 0 ? prev - 1 : prev,
-                                      )
-                                    }
-                                    disabled={selectedQuestionIndex === 0}
-                                  >
-                                    <IconChevronUp className="h-4 w-4 mr-1 rotate-[-90deg]" />
-                                    Previous
-                                  </Button>
-                                  <span className="text-sm text-muted-foreground">
-                                    {selectedQuestionIndex + 1} of{" "}
-                                    {quiz.questions.length}
-                                  </span>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() =>
-                                      setSelectedQuestionIndex((prev) =>
-                                        prev < quiz.questions!.length - 1
-                                          ? prev + 1
-                                          : prev,
-                                      )
-                                    }
-                                    disabled={
-                                      selectedQuestionIndex ===
-                                      quiz.questions.length - 1
-                                    }
-                                  >
-                                    Next
-                                    <IconChevronDown className="h-4 w-4 ml-1 rotate-[-90deg]" />
-                                  </Button>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          );
-                        })}
-                    </div>
-                  </SortableContext>
-                </DndContext>
-              )}
-            </>
-          ) : (
-            <Card className="border-dashed">
-              <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
-                <div className="rounded-full bg-muted p-4">
-                  <IconPlus className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <div className="text-center space-y-2">
-                  <p className="font-medium">No questions yet</p>
-                  <p className="text-sm text-muted-foreground max-w-sm">
-                    Get started by adding your first question. You need at least
-                    one question to go live.
-                  </p>
-                </div>
-                <Button onClick={() => setAddQuestionModalOpen(true)} size="lg">
-                  <IconPlus className="h-4 w-4 mr-2" />
-                  Add Your First Question
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+                              {/* Navigation Buttons */}
+                              <div className="flex items-center justify-between pt-4 border-t">
+                                <Button
+                                  variant="outline"
+                                  onClick={() =>
+                                    setSelectedQuestionIndex((prev) =>
+                                      prev > 0 ? prev - 1 : prev,
+                                    )
+                                  }
+                                  disabled={selectedQuestionIndex === 0}
+                                >
+                                  <IconChevronUp className="h-4 w-4 mr-1 rotate-[-90deg]" />
+                                  Previous
+                                </Button>
+                                <span className="text-sm text-muted-foreground">
+                                  {selectedQuestionIndex + 1} of{" "}
+                                  {quiz.questions.length}
+                                </span>
+                                <Button
+                                  variant="outline"
+                                  onClick={() =>
+                                    setSelectedQuestionIndex((prev) =>
+                                      prev < quiz.questions!.length - 1
+                                        ? prev + 1
+                                        : prev,
+                                    )
+                                  }
+                                  disabled={
+                                    selectedQuestionIndex ===
+                                    quiz.questions.length - 1
+                                  }
+                                >
+                                  Next
+                                  <IconChevronDown className="h-4 w-4 ml-1 rotate-[-90deg]" />
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            )}
+          </>
+        ) : (
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
+              <div className="rounded-full bg-muted p-4">
+                <IconPlus className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <div className="text-center space-y-2">
+                <p className="font-medium">No questions yet</p>
+                <p className="text-sm text-muted-foreground max-w-sm">
+                  Get started by adding your first question. You need at least
+                  one question to go live.
+                </p>
+              </div>
+              <Button onClick={() => setAddQuestionModalOpen(true)} size="lg">
+                <IconPlus className="h-4 w-4 mr-2" />
+                Add Your First Question
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       <AddQuestionModal
         open={addQuestionModalOpen}

@@ -48,9 +48,7 @@ export default function PreviewQuizPage() {
     if (option === currentQuestion.correctOption) {
       setScore((prev) => prev + (quiz.baseScore || 100));
     } else {
-      setScore((prev) =>
-        Math.max(0, prev - (quiz.negativeScore || 0)),
-      );
+      setScore((prev) => Math.max(0, prev - (quiz.negativeScore || 0)));
     }
   };
 

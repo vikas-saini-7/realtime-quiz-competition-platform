@@ -96,9 +96,7 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
             ) : (
               <IconHandFinger className="h-4 w-4" />
             )}
-            <span>
-              {quiz.isAutomatic ? "Automatic" : "Manual"}
-            </span>
+            <span>{quiz.isAutomatic ? "Automatic" : "Manual"}</span>
           </div>
           {quiz.scheduledAt && (
             <div className="flex items-center gap-2">
@@ -139,13 +137,21 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
                 className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
                 onClick={handleGoLiveClick}
                 disabled={!quiz.questionCount || quiz.questionCount === 0}
-                title={!quiz.questionCount || quiz.questionCount === 0 ? "Add at least one question to go live" : ""}
+                title={
+                  !quiz.questionCount || quiz.questionCount === 0
+                    ? "Add at least one question to go live"
+                    : ""
+                }
               >
                 <IconPlayerPlay className="h-4 w-4 mr-1" />
                 Go Live
               </Button>
             ) : quiz.status === "LIVE" ? (
-              <Button asChild size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+              <Button
+                asChild
+                size="sm"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              >
                 <Link href={`/host/quiz/${quiz.id}/live`}>
                   <IconDeviceGamepad2 className="h-4 w-4 mr-1" />
                   Control
@@ -196,20 +202,25 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
           <DialogHeader>
             <DialogTitle>Start Quiz Live</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="space-y-2">
               <div className="flex items-start gap-2">
                 <IconId className="h-4 w-4 text-muted-foreground mt-0.5" />
                 <p className="text-sm">
-                  <strong className="font-semibold text-foreground">{quiz.title}</strong>
-                  <span className="font-mono text-muted-foreground ml-1.5">({quiz.code})</span>
+                  <strong className="font-semibold text-foreground">
+                    {quiz.title}
+                  </strong>
+                  <span className="font-mono text-muted-foreground ml-1.5">
+                    ({quiz.code})
+                  </span>
                 </p>
               </div>
               <div className="flex items-start gap-2">
                 <IconListNumbers className="h-4 w-4 text-muted-foreground mt-0.5" />
                 <p className="text-sm text-muted-foreground">
-                  {quiz.questionCount} {quiz.questionCount === 1 ? "question" : "questions"}
+                  {quiz.questionCount}{" "}
+                  {quiz.questionCount === 1 ? "question" : "questions"}
                 </p>
               </div>
               <div className="flex items-start gap-2">
@@ -240,10 +251,7 @@ export function QuizCard({ quiz, isHost, onDelete, onGoLive }: QuizCardProps) {
           </div>
 
           <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setGoLiveModalOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setGoLiveModalOpen(false)}>
               Cancel
             </Button>
             <Button

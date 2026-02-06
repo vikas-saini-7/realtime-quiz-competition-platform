@@ -85,7 +85,15 @@ export default function QuizSettingsPage() {
       });
       setHasChanges(false);
     }
-  }, [quiz?.id, quiz?.title, quiz?.description, quiz?.isAutomatic, quiz?.baseScore, quiz?.negativeScore, quiz?.scheduledAt]);
+  }, [
+    quiz?.id,
+    quiz?.title,
+    quiz?.description,
+    quiz?.isAutomatic,
+    quiz?.baseScore,
+    quiz?.negativeScore,
+    quiz?.scheduledAt,
+  ]);
 
   if (isLoading) {
     return (
@@ -166,9 +174,7 @@ export default function QuizSettingsPage() {
                   setHasChanges(true);
                 }}
                 placeholder="Quiz title"
-                disabled={
-                  quiz.status === "LIVE" || quiz.status === "COMPLETED"
-                }
+                disabled={quiz.status === "LIVE" || quiz.status === "COMPLETED"}
               />
             </div>
             <div className="space-y-2">
@@ -186,14 +192,15 @@ export default function QuizSettingsPage() {
             <Textarea
               value={settingsForm.description}
               onChange={(e) => {
-                setSettingsForm({ ...settingsForm, description: e.target.value });
+                setSettingsForm({
+                  ...settingsForm,
+                  description: e.target.value,
+                });
                 setHasChanges(true);
               }}
               placeholder="Quiz description (optional)"
               className="resize-none min-h-[80px]"
-              disabled={
-                quiz.status === "LIVE" || quiz.status === "COMPLETED"
-              }
+              disabled={quiz.status === "LIVE" || quiz.status === "COMPLETED"}
             />
           </div>
 
@@ -203,7 +210,9 @@ export default function QuizSettingsPage() {
           <div className="space-y-4">
             <div>
               <h3 className="text-sm font-semibold mb-1">Quiz Behavior</h3>
-              <p className="text-xs text-muted-foreground">Control progression mode</p>
+              <p className="text-xs text-muted-foreground">
+                Control progression mode
+              </p>
             </div>
             <div className="flex items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
@@ -240,7 +249,9 @@ export default function QuizSettingsPage() {
           <div className="space-y-4">
             <div>
               <h3 className="text-sm font-semibold mb-1">Scoring System</h3>
-              <p className="text-xs text-muted-foreground">Configure points for correct and incorrect answers</p>
+              <p className="text-xs text-muted-foreground">
+                Configure points for correct and incorrect answers
+              </p>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
@@ -250,7 +261,10 @@ export default function QuizSettingsPage() {
                   min={0}
                   value={settingsForm.baseScore}
                   onChange={(e) => {
-                    setSettingsForm({ ...settingsForm, baseScore: parseInt(e.target.value) || 0 });
+                    setSettingsForm({
+                      ...settingsForm,
+                      baseScore: parseInt(e.target.value) || 0,
+                    });
                     setHasChanges(true);
                   }}
                   placeholder="Points for correct answer"
@@ -269,7 +283,10 @@ export default function QuizSettingsPage() {
                   min={0}
                   value={settingsForm.negativeScore}
                   onChange={(e) => {
-                    setSettingsForm({ ...settingsForm, negativeScore: parseInt(e.target.value) || 0 });
+                    setSettingsForm({
+                      ...settingsForm,
+                      negativeScore: parseInt(e.target.value) || 0,
+                    });
                     setHasChanges(true);
                   }}
                   placeholder="Penalty for wrong answer"
@@ -295,12 +312,13 @@ export default function QuizSettingsPage() {
                 type="datetime-local"
                 value={settingsForm.scheduledAt}
                 onChange={(e) => {
-                  setSettingsForm({ ...settingsForm, scheduledAt: e.target.value });
+                  setSettingsForm({
+                    ...settingsForm,
+                    scheduledAt: e.target.value,
+                  });
                   setHasChanges(true);
                 }}
-                disabled={
-                  quiz.status === "LIVE" || quiz.status === "COMPLETED"
-                }
+                disabled={quiz.status === "LIVE" || quiz.status === "COMPLETED"}
               />
               <p className="text-xs text-muted-foreground">
                 Optional: Set when quiz becomes available
@@ -313,7 +331,9 @@ export default function QuizSettingsPage() {
               <div className="rounded-lg border p-3 space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Questions</span>
-                  <span className="font-semibold">{quiz.questions?.length || 0}</span>
+                  <span className="font-semibold">
+                    {quiz.questions?.length || 0}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Status</span>
