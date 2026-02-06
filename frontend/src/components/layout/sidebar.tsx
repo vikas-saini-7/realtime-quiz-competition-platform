@@ -19,24 +19,9 @@ const sidebarItems = [
     icon: IconLayoutDashboard,
   },
   {
-    title: "Analytics",
-    href: "/host/analytics",
-    icon: IconChartBar,
-  },
-  {
-    title: "Browse Quizzes",
-    href: "/play/browse",
+    title: "Manage Quizzes",
+    href: "/host/quizzes",
     icon: IconDeviceGamepad2,
-  },
-  {
-    title: "Quiz History",
-    href: "/user/history",
-    icon: IconHistory,
-  },
-  {
-    title: "Profile",
-    href: "/user/profile",
-    icon: IconUser,
   },
   {
     title: "Settings",
@@ -62,7 +47,7 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all",
                   isActive
-                    ? "bg-background text-foreground"
+                    ? "bg-gray-500/10 text-foreground"
                     : "text-muted-foreground hover:bg-background/50 hover:text-foreground",
                 )}
               >

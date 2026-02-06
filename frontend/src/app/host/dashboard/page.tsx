@@ -1,120 +1,151 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconPlus, IconBrain } from "@tabler/icons-react";
+import {
+  IconPlus,
+  IconBrain,
+  IconUsers,
+  IconTrophy,
+  IconChartBar,
+} from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { CardSkeleton } from "@/components/ui/card-skeleton";
-import { QuizCard } from "@/components/quiz/quiz-card";
-import { CreateQuizModal } from "@/components/quiz/create-quiz-modal";
-import { useMyQuizzes, useDeleteQuiz, useUpdateQuiz } from "@/hooks";
-import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
+import { useMyQuizzes } from "@/hooks";
+import { useAuthStore } from "@/store";
 
 export default function HostDashboardPage() {
   const router = useRouter();
-  const { data: quizzes, isLoading, error } = useMyQuizzes();
-  const deleteQuiz = useDeleteQuiz();
-  const updateQuiz = useUpdateQuiz();
-  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const { data: quizzes, isLoading } = useMyQuizzes();
+  const user = useAuthStore((state) => state.user);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this quiz?")) return;
+  const firstName = user?.name?.split(" ")[0] || "";
 
-    try {
-      await deleteQuiz.mutateAsync(id);
-      toast.success("Quiz deleted successfully");
-    } catch {
-      toast.error("Failed to delete quiz");
-    }
+  const stats = {
+    totalQuizzes: quizzes?.length || 0,
+    liveQuizzes: quizzes?.filter((q) => q.status === "LIVE").length || 0,
+    draftQuizzes: quizzes?.filter((q) => q.status === "DRAFT").length || 0,
+    completedQuizzes:
+      quizzes?.filter((q) => q.status === "COMPLETED").length || 0,
   };
-
-  const handleGoLive = async (id: string) => {
-    const quiz = quizzes?.find((q) => q.id === id);
-    if (!quiz?.questionCount || quiz.questionCount === 0) {
-      toast.error("Add at least one question before going live");
-      return;
-    }
-
-    try {
-      await updateQuiz.mutateAsync({ id, data: { status: "LIVE" } });
-      router.push(`/host/quiz/${id}/live`);
-    } catch {
-      toast.error("Failed to start quiz");
-    }
-  };
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <p className="text-muted-foreground">Failed to load quizzes</p>
-        <Button onClick={() => window.location.reload()}>Retry</Button>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Quizzes</h1>
-          <p className="text-muted-foreground mt-1">
-            {quizzes?.length || 0} {quizzes?.length === 1 ? "quiz" : "quizzes"}
-          </p>
-        </div>
-        <Button
-          onClick={() => setCreateModalOpen(true)}
-          size="lg"
-          className="rounded-xl"
-        >
-          <IconPlus className="h-4 w-4 mr-2" />
-          New Quiz
-        </Button>
+      {/* Welcome Section */}
+      <div>
+        <h1 className="text-4xl font-bold tracking-tight">
+          Welcome Back{firstName ? `, ${firstName}` : ""}!
+        </h1>
+        <p className="text-muted-foreground mt-2 text-lg">
+          Here's an overview of your quiz platform
+        </p>
       </div>
 
-      {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[...Array(3)].map((_, i) => (
-            <CardSkeleton key={i} className="h-56" showHeader={false} />
-          ))}
-        </div>
-      ) : quizzes && quizzes.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {quizzes.map((quiz) => (
-            <QuizCard
-              key={quiz.id}
-              quiz={quiz}
-              isHost
-              onDelete={handleDelete}
-              onGoLive={handleGoLive}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center min-h-[500px] gap-6 rounded-3xl bg-muted/20 dark:bg-muted/10">
-          <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-muted">
-            <IconBrain className="h-10 w-10 text-muted-foreground" />
+      {/* Stats Grid */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="p-6 bg-white dark:bg-gray-500/10">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-blue-500/10">
+              <IconBrain className="h-6 w-6 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Total Quizzes</p>
+              <p className="text-2xl font-bold">
+                {isLoading ? "..." : stats.totalQuizzes}
+              </p>
+            </div>
           </div>
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold">Create your first quiz</h2>
-            <p className="text-muted-foreground max-w-sm">
-              Get started by creating a quiz and share it with your audience.
-            </p>
+        </Card>
+
+        <Card className="p-6 bg-white dark:bg-gray-500/10">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-green-500/10">
+              <IconUsers className="h-6 w-6 text-green-500" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Live Quizzes</p>
+              <p className="text-2xl font-bold">
+                {isLoading ? "..." : stats.liveQuizzes}
+              </p>
+            </div>
           </div>
+        </Card>
+
+        <Card className="p-6 bg-white dark:bg-gray-500/10">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-yellow-500/10">
+              <IconChartBar className="h-6 w-6 text-yellow-500" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Draft Quizzes</p>
+              <p className="text-2xl font-bold">
+                {isLoading ? "..." : stats.draftQuizzes}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6 bg-white dark:bg-gray-500/10">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-purple-500/10">
+              <IconTrophy className="h-6 w-6 text-purple-500" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Completed</p>
+              <p className="text-2xl font-bold">
+                {isLoading ? "..." : stats.completedQuizzes}
+              </p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <Card className="p-6 bg-white dark:bg-gray-500/10">
+        <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Button
-            onClick={() => setCreateModalOpen(true)}
-            size="lg"
-            className="rounded-xl"
+            onClick={() => router.push("/host/quizzes")}
+            variant="outline"
+            className="justify-start h-auto py-4"
           >
-            <IconPlus className="h-4 w-4 mr-2" />
-            New Quiz
+            <IconBrain className="h-5 w-5 mr-3" />
+            <div className="text-left">
+              <div className="font-medium">View All Quizzes</div>
+              <div className="text-xs text-muted-foreground">
+                Manage your quiz library
+              </div>
+            </div>
+          </Button>
+
+          <Button
+            onClick={() => router.push("/host/quizzes")}
+            variant="outline"
+            className="justify-start h-auto py-4"
+          >
+            <IconPlus className="h-5 w-5 mr-3" />
+            <div className="text-left">
+              <div className="font-medium">Create New Quiz</div>
+              <div className="text-xs text-muted-foreground">
+                Start building a quiz
+              </div>
+            </div>
+          </Button>
+
+          <Button
+            onClick={() => router.push("/host/settings")}
+            variant="outline"
+            className="justify-start h-auto py-4"
+          >
+            <IconChartBar className="h-5 w-5 mr-3" />
+            <div className="text-left">
+              <div className="font-medium">Settings</div>
+              <div className="text-xs text-muted-foreground">
+                Configure your account
+              </div>
+            </div>
           </Button>
         </div>
-      )}
-
-      <CreateQuizModal
-        open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
-      />
+      </Card>
     </div>
   );
 }
