@@ -29,6 +29,12 @@ export default function HostDashboardPage() {
   };
 
   const handleGoLive = async (id: string) => {
+    const quiz = quizzes?.find((q) => q.id === id);
+    if (!quiz?.questionCount || quiz.questionCount === 0) {
+      toast.error("Add at least one question before going live");
+      return;
+    }
+
     try {
       await updateQuiz.mutateAsync({ id, data: { status: "LIVE" } });
       router.push(`/host/quiz/${id}/live`);

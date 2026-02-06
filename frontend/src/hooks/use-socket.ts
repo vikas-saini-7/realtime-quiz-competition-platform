@@ -212,8 +212,13 @@ export function useSocket() {
 
 // Host actions
 export function useHostActions() {
-  const { setTotalQuestions, setStatus, setParticipantCount, reset } =
-    useQuizStore();
+  const {
+    setTotalQuestions,
+    setStatus,
+    setParticipantCount,
+    setIsAutomatic,
+    reset,
+  } = useQuizStore();
 
   const initializeQuiz = useCallback(
     (quizId: string): Promise<InitializeQuizResponse> => {
@@ -231,6 +236,7 @@ export function useHostActions() {
               // Reset store to clear any previous quiz data
               reset();
               setTotalQuestions(response.state.totalQuestions);
+              setIsAutomatic(response.state.isAutomatic || false);
               setStatus("waiting");
               setParticipantCount(response.participantCount || 0);
               // Set the participants who joined earlier

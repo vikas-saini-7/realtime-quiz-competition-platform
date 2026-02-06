@@ -28,8 +28,6 @@ export class QuestionsService {
         optionD: createQuestionDto.optionD,
         correctOption: createQuestionDto.correctOption,
         timeLimit: createQuestionDto.timeLimit || 30,
-        baseScore: createQuestionDto.baseScore || 100,
-        negativeScore: createQuestionDto.negativeScore || 25,
         orderIndex: createQuestionDto.orderIndex,
       })
       .returning();
@@ -49,8 +47,6 @@ export class QuestionsService {
       optionD: q.optionD,
       correctOption: q.correctOption,
       timeLimit: q.timeLimit || 30,
-      baseScore: q.baseScore || 100,
-      negativeScore: q.negativeScore || 25,
       orderIndex: q.orderIndex,
     }));
 
@@ -136,12 +132,6 @@ export class QuestionsService {
     }
     if (updateQuestionDto.timeLimit !== undefined) {
       updateData.timeLimit = updateQuestionDto.timeLimit;
-    }
-    if (updateQuestionDto.baseScore !== undefined) {
-      updateData.baseScore = updateQuestionDto.baseScore;
-    }
-    if (updateQuestionDto.negativeScore !== undefined) {
-      updateData.negativeScore = updateQuestionDto.negativeScore;
     }
     if (updateQuestionDto.orderIndex !== undefined) {
       updateData.orderIndex = updateQuestionDto.orderIndex;

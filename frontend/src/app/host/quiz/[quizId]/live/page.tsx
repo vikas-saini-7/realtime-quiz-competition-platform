@@ -56,6 +56,7 @@ export default function LiveQuizPage() {
     currentQuestion,
     questionEndTime,
     questionScores,
+    isAutomatic,
     setStatus,
     setTotalQuestions,
     reset,
@@ -331,6 +332,21 @@ export default function LiveQuizPage() {
               <CardTitle>Controls</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Show mode indicator */}
+              {status !== "idle" && status !== "finished" && (
+                <div className="text-center text-sm p-2 bg-muted rounded-md">
+                  Mode:{" "}
+                  <span className="font-semibold">
+                    {isAutomatic ? "Automatic" : "Manual"}
+                  </span>
+                  {isAutomatic && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Questions advance automatically
+                    </p>
+                  )}
+                </div>
+              )}
+
               {isInitializing ? (
                 <div className="flex items-center justify-center py-8">
                   <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -350,22 +366,25 @@ export default function LiveQuizPage() {
                 </Button>
               ) : status === "active" || status === "between_questions" ? (
                 <div className="space-y-3">
-                  <Button
-                    onClick={handleNextQuestion}
-                    disabled={isAdvancing || isTimerActive}
-                    className="w-full"
-                    size="lg"
-                  >
-                    {isAdvancing && (
-                      <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    <IconPlayerSkipForward className="h-5 w-5 mr-2" />
-                    {questionIndex === -1
-                      ? "Show First Question"
-                      : status === "active" && isTimerActive
-                        ? `Wait for (${timeRemaining}s)`
-                        : "Next Question"}
-                  </Button>
+                  {/* Only show next button for manual mode */}
+                  {!isAutomatic && (
+                    <Button
+                      onClick={handleNextQuestion}
+                      disabled={isAdvancing || isTimerActive}
+                      className="w-full"
+                      size="lg"
+                    >
+                      {isAdvancing && (
+                        <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      <IconPlayerSkipForward className="h-5 w-5 mr-2" />
+                      {questionIndex === -1
+                        ? "Show First Question"
+                        : status === "active" && isTimerActive
+                          ? `Wait for (${timeRemaining}s)`
+                          : "Next Question"}
+                    </Button>
+                  )}
                   {isTimerActive && timeRemaining !== null && (
                     <div className="text-center">
                       <div className="text-3xl font-bold text-primary">
@@ -376,6 +395,14 @@ export default function LiveQuizPage() {
                       </div>
                     </div>
                   )}
+                  {/* Show status message for automatic mode */}
+                  {isAutomatic &&
+                    !isTimerActive &&
+                    status === "between_questions" && (
+                      <div className="text-center text-sm text-muted-foreground">
+                        Next question loading...
+                      </div>
+                    )}
                 </div>
               ) : status === "finished" ? (
                 <p className="text-center text-muted-foreground py-4">

@@ -18,8 +18,6 @@ export const questions = pgTable(
     optionD: varchar('option_d', { length: 500 }).notNull(),
     correctOption: varchar('correct_option', { length: 1 }).notNull(), // A, B, C, or D
     timeLimit: integer('time_limit').notNull().default(30), // seconds
-    baseScore: integer('base_score').notNull().default(100),
-    negativeScore: integer('negative_score').notNull().default(25),
     orderIndex: integer('order_index').notNull(),
   },
   (table) => ({

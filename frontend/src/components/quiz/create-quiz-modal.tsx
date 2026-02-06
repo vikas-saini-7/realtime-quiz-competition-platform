@@ -8,6 +8,7 @@ import { IconLoader2 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,7 @@ import { toast } from "sonner";
 const createQuizSchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title is too long"),
   description: z.string().max(500, "Description is too long").optional(),
+  isAutomatic: z.boolean().default(false),
   scheduledAt: z.string().optional(),
 });
 
@@ -50,6 +52,7 @@ export function CreateQuizModal({ open, onOpenChange }: CreateQuizModalProps) {
     defaultValues: {
       title: "",
       description: "",
+      isAutomatic: false,
       scheduledAt: "",
     },
   });
@@ -59,6 +62,7 @@ export function CreateQuizModal({ open, onOpenChange }: CreateQuizModalProps) {
       const quiz = await createQuiz.mutateAsync({
         title: data.title,
         description: data.description || undefined,
+        isAutomatic: data.isAutomatic,
         scheduledAt: data.scheduledAt || undefined,
       });
       toast.success("Quiz created successfully!");
@@ -126,6 +130,29 @@ export function CreateQuizModal({ open, onOpenChange }: CreateQuizModalProps) {
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="isAutomatic"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-xl border p-4 space-y-0">
+                  <div className="space-y-0.5">
+                    <FormLabel className="text-sm font-semibold">
+                      Automatic Mode
+                    </FormLabel>
+                    <FormDescription className="text-xs">
+                      Questions advance automatically when time expires
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
                 </FormItem>
               )}
             />

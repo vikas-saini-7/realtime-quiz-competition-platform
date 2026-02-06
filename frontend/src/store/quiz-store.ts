@@ -22,6 +22,7 @@ interface QuizState {
   quizId: string | null;
   attemptId: string | null;
   quizTitle: string | null;
+  isAutomatic: boolean;
 
   // Current question
   currentQuestion: QuestionForParticipant | null;
@@ -58,6 +59,7 @@ interface QuizState {
 
   // Actions
   setConnected: (connected: boolean) => void;
+  setIsAutomatic: (isAutomatic: boolean) => void;
   joinQuiz: (quizId: string, attemptId: string, title: string) => void;
   setQuestion: (event: QuizQuestionEvent) => void;
   submitAnswer: (option: OptionLetter) => void;
@@ -89,6 +91,7 @@ const initialState = {
   quizId: null,
   attemptId: null,
   quizTitle: null,
+  isAutomatic: false,
   currentQuestion: null,
   questionIndex: -1,
   totalQuestions: 0,
@@ -110,6 +113,8 @@ export const useQuizStore = create<QuizState>((set) => ({
   ...initialState,
 
   setConnected: (connected) => set({ isConnected: connected }),
+
+  setIsAutomatic: (isAutomatic) => set({ isAutomatic }),
 
   joinQuiz: (quizId, attemptId, title) =>
     set({

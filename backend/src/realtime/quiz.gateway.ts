@@ -190,6 +190,7 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.quizId,
       user.id,
       questionCount,
+      quiz.isAutomatic || false,
     );
 
     // Update quiz status to LIVE
@@ -544,6 +545,12 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new WsException('Quiz not found');
     }
 
+    // Get the quiz for scoring information
+    const quiz = await this.quizzesService.findById(data.quizId);
+    if (!quiz) {
+      throw new WsException('Quiz not found');
+    }
+
     this.logger.debug(`Quiz state status: ${state.status}`);
 
     if (state.status !== 'question') {
@@ -592,10 +599,10 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
     let scoreAwarded = 0;
     if (isCorrect) {
       // Base score + speed bonus
-      scoreAwarded = question.baseScore + Math.floor(remainingTime * SPEED_MULTIPLIER);
+      scoreAwarded = quiz.baseScore + Math.floor(remainingTime * SPEED_MULTIPLIER);
     } else {
       // Negative marking
-      scoreAwarded = -question.negativeScore;
+      scoreAwarded = -quiz.negativeScore;
     }
 
     // Save the answer
@@ -732,6 +739,83 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
       correctOption: question?.correctOption,
       leaderboard,
     });
+
+    // If quiz is in automatic mode, advance to next question automatically
+    if (state.isAutomatic) {
+      this.logger.log(
+        `Quiz ${quizId} is in automatic mode, advancing to next question in 3 seconds...`,
+      );
+
+      // Wait 3 seconds to show results, then advance
+      setTimeout(async () => {
+        const currentState = await this.quizStateService.getQuizState(quizId);
+        if (
+          !currentState ||
+          currentState.status !== 'between_questions' ||
+          currentState.currentQuestionIndex !== questionIndex
+        ) {
+          return; // Quiz state has changed, don't auto-advance
+        }
+
+        const nextIndex = questionIndex + 1;
+
+        // Check if there are more questions
+        if (nextIndex >= state.totalQuestions) {
+          // Quiz is finished
+          await this.handleQuizEnd(quizId);
+          return;
+        }
+
+        // Advance to next question
+        try {
+          const nextQuestion = await this.questionsService.findByQuizIdAndOrder(
+            quizId,
+            nextIndex,
+          );
+
+          if (!nextQuestion) {
+            this.logger.error(`Question ${nextIndex} not found for quiz ${quizId}`);
+            await this.handleQuizEnd(quizId);
+            return;
+          }
+
+          await this.quizStateService.setCurrentQuestion(
+            quizId,
+            nextIndex,
+            nextQuestion.timeLimit,
+          );
+
+          const questionData = {
+            questionIndex: nextIndex,
+            totalQuestions: state.totalQuestions,
+            question: {
+              id: nextQuestion.id,
+              questionText: nextQuestion.questionText,
+              optionA: nextQuestion.optionA,
+              optionB: nextQuestion.optionB,
+              optionC: nextQuestion.optionC,
+              optionD: nextQuestion.optionD,
+              timeLimit: nextQuestion.timeLimit,
+            },
+            startTime: Date.now(),
+            endTime: Date.now() + nextQuestion.timeLimit * 1000,
+          };
+
+          this.server.to(roomName).emit('quiz:question', questionData);
+
+          this.logger.log(
+            `[AUTO] Question ${nextIndex + 1}/${state.totalQuestions} sent for quiz ${quizId}`,
+          );
+
+          // Schedule next question end
+          setTimeout(async () => {
+            await this.handleQuestionTimeUp(quizId, nextIndex);
+          }, nextQuestion.timeLimit * 1000);
+        } catch (error) {
+          this.logger.error(`Error auto-advancing question for quiz ${quizId}:`, error);
+        }
+      }, 3000); // 3 second delay to show results
+    }
   }
 
   private async handleQuizEnd(quizId: string): Promise<void> {

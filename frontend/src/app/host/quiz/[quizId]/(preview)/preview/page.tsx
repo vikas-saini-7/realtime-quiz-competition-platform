@@ -40,16 +40,16 @@ export default function PreviewQuizPage() {
       : 0;
 
   const handleSelectOption = (option: OptionLetter) => {
-    if (showAnswer || !currentQuestion) return;
+    if (showAnswer || !currentQuestion || !quiz) return;
     setSelectedOption(option);
     setShowAnswer(true);
 
     // Calculate score
     if (option === currentQuestion.correctOption) {
-      setScore((prev) => prev + (currentQuestion.baseScore || 10));
+      setScore((prev) => prev + (quiz.baseScore || 100));
     } else {
       setScore((prev) =>
-        Math.max(0, prev - (currentQuestion.negativeScore || 0)),
+        Math.max(0, prev - (quiz.negativeScore || 0)),
       );
     }
   };
@@ -231,7 +231,7 @@ export default function PreviewQuizPage() {
               <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
                 <span>Time: {currentQuestion.timeLimit}s</span>
                 <span>•</span>
-                <span>Points: {currentQuestion.baseScore || 10}</span>
+                <span>Points: {quiz?.baseScore || 100}</span>
               </div>
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold leading-relaxed px-4">
                 {currentQuestion.questionText}

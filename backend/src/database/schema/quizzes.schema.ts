@@ -6,6 +6,8 @@ import {
   timestamp,
   pgEnum,
   index,
+  boolean,
+  integer,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users } from './users.schema';
@@ -32,6 +34,9 @@ export const quizzes = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     status: quizStatusEnum('status').notNull().default('DRAFT'),
+    isAutomatic: boolean('is_automatic').notNull().default(false),
+    baseScore: integer('base_score').notNull().default(100),
+    negativeScore: integer('negative_score').notNull().default(25),
     scheduledAt: timestamp('scheduled_at'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },

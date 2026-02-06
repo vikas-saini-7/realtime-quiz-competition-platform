@@ -61,6 +61,9 @@ export class QuizzesService {
         title: createQuizDto.title,
         description: createQuizDto.description,
         hostId,
+        isAutomatic: createQuizDto.isAutomatic ?? false,
+        baseScore: createQuizDto.baseScore ?? 100,
+        negativeScore: createQuizDto.negativeScore ?? 25,
         scheduledAt: createQuizDto.scheduledAt
           ? new Date(createQuizDto.scheduledAt)
           : null,
@@ -71,15 +74,47 @@ export class QuizzesService {
   }
 
   async findAll(): Promise<Quiz[]> {
-    return this.db.select().from(quizzes).orderBy(desc(quizzes.createdAt));
+    const result = await this.db.select().from(quizzes).orderBy(desc(quizzes.createdAt));
+    
+    // Add question count for each quiz
+    const quizzesWithCount = await Promise.all(
+      result.map(async (quiz) => {
+        const questionCount = await this.db
+          .select()
+          .from(questions)
+          .where(eq(questions.quizId, quiz.id));
+        return {
+          ...quiz,
+          questionCount: questionCount.length,
+        };
+      }),
+    );
+    
+    return quizzesWithCount;
   }
 
   async findByHost(hostId: string): Promise<Quiz[]> {
-    return this.db
+    const result = await this.db
       .select()
       .from(quizzes)
       .where(eq(quizzes.hostId, hostId))
       .orderBy(desc(quizzes.createdAt));
+    
+    // Add question count for each quiz
+    const quizzesWithCount = await Promise.all(
+      result.map(async (quiz) => {
+        const questionCount = await this.db
+          .select()
+          .from(questions)
+          .where(eq(questions.quizId, quiz.id));
+        return {
+          ...quiz,
+          questionCount: questionCount.length,
+        };
+      }),
+    );
+    
+    return quizzesWithCount;
   }
 
   async findById(id: string): Promise<Quiz | null> {
@@ -149,6 +184,15 @@ export class QuizzesService {
     }
     if (updateQuizDto.status !== undefined) {
       updateData.status = updateQuizDto.status;
+    }
+    if (updateQuizDto.isAutomatic !== undefined) {
+      updateData.isAutomatic = updateQuizDto.isAutomatic;
+    }
+    if (updateQuizDto.baseScore !== undefined) {
+      updateData.baseScore = updateQuizDto.baseScore;
+    }
+    if (updateQuizDto.negativeScore !== undefined) {
+      updateData.negativeScore = updateQuizDto.negativeScore;
     }
     if (updateQuizDto.scheduledAt !== undefined) {
       updateData.scheduledAt = new Date(updateQuizDto.scheduledAt);

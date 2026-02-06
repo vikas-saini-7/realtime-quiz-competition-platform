@@ -42,8 +42,6 @@ const questionSchema = z.object({
   optionD: z.string().min(1, "Option D is required"),
   correctOption: z.enum(["A", "B", "C", "D"]),
   timeLimit: z.coerce.number().min(5).max(120),
-  baseScore: z.coerce.number().min(0),
-  negativeScore: z.coerce.number().min(0),
 });
 
 type QuestionFormValues = z.infer<typeof questionSchema>;
@@ -77,8 +75,6 @@ export function AddQuestionModal({
       optionD: "",
       correctOption: "A",
       timeLimit: 30,
-      baseScore: 100,
-      negativeScore: 25,
     },
   });
 
@@ -93,8 +89,6 @@ export function AddQuestionModal({
         optionD: question.optionD,
         correctOption: question.correctOption,
         timeLimit: question.timeLimit,
-        baseScore: question.baseScore,
-        negativeScore: question.negativeScore,
       });
     } else if (!open) {
       // Reset form when modal closes
@@ -106,8 +100,6 @@ export function AddQuestionModal({
         optionD: "",
         correctOption: "A",
         timeLimit: 30,
-        baseScore: 100,
-        negativeScore: 25,
       });
     }
   }, [question, open, form]);
@@ -197,7 +189,7 @@ export function AddQuestionModal({
 
             <div className="space-y-3">
               <p className="text-sm font-semibold">Settings</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={form.control}
                   name="correctOption"
@@ -240,48 +232,6 @@ export function AddQuestionModal({
                           type="number"
                           min={5}
                           max={120}
-                          className="h-11 rounded-xl"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="baseScore"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-medium text-muted-foreground">
-                        Score
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
-                          className="h-11 rounded-xl"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="negativeScore"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-medium text-muted-foreground">
-                        Penalty
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
                           className="h-11 rounded-xl"
                           {...field}
                         />

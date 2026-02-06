@@ -7,6 +7,7 @@ export interface QuizState {
   status: 'waiting' | 'active' | 'question' | 'between_questions' | 'finished';
   currentQuestionIndex: number;
   totalQuestions: number;
+  isAutomatic: boolean;
   questionStartTime: number | null;
   questionEndTime: number | null;
 }
@@ -45,6 +46,7 @@ export class QuizStateService {
     quizId: string,
     hostId: string,
     totalQuestions: number,
+    isAutomatic: boolean = false,
   ): Promise<QuizState> {
     const state: QuizState = {
       quizId,
@@ -52,6 +54,7 @@ export class QuizStateService {
       status: 'waiting',
       currentQuestionIndex: -1,
       totalQuestions,
+      isAutomatic,
       questionStartTime: null,
       questionEndTime: null,
     };
@@ -74,6 +77,7 @@ export class QuizStateService {
       status: data.status as QuizState['status'],
       currentQuestionIndex: parseInt(data.currentQuestionIndex, 10),
       totalQuestions: parseInt(data.totalQuestions, 10),
+      isAutomatic: data.isAutomatic === 'true',
       questionStartTime: data.questionStartTime
         ? parseInt(data.questionStartTime, 10)
         : null,
@@ -89,6 +93,7 @@ export class QuizStateService {
       status: state.status,
       currentQuestionIndex: state.currentQuestionIndex.toString(),
       totalQuestions: state.totalQuestions.toString(),
+      isAutomatic: state.isAutomatic.toString(),
       questionStartTime: state.questionStartTime?.toString() || '',
       questionEndTime: state.questionEndTime?.toString() || '',
     };

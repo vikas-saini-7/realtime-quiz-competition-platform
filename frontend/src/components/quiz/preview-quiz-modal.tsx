@@ -28,8 +28,6 @@ interface Question {
   optionD: string;
   correctOption: OptionLetter;
   timeLimit: number;
-  baseScore: number;
-  negativeScore: number;
   orderIndex: number;
 }
 
@@ -37,6 +35,8 @@ interface Quiz {
   id: string;
   title: string;
   description?: string;
+  baseScore: number;
+  negativeScore: number;
   questions?: Question[];
 }
 
@@ -83,9 +83,9 @@ export function PreviewQuizModal({
 
     // Calculate score
     if (option === currentQuestion.correctOption) {
-      setScore((prev) => prev + (currentQuestion.baseScore || 10));
+      setScore((prev) => prev + (quiz.baseScore || 100));
     } else {
-      setScore((prev) => prev - (currentQuestion.negativeScore || 0));
+      setScore((prev) => prev - (quiz.negativeScore || 0));
     }
   };
 
@@ -164,7 +164,7 @@ export function PreviewQuizModal({
                       Time Limit: {currentQuestion.timeLimit}s
                     </span>
                     <span className="text-sm font-semibold">
-                      Points: {currentQuestion.baseScore || 10}
+                      Points: {quiz.baseScore || 100}
                     </span>
                   </div>
                   <h3 className="text-xl font-semibold leading-relaxed">

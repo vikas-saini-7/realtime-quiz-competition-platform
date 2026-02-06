@@ -41,6 +41,9 @@ export interface Quiz {
   description: string | null;
   hostId: string;
   status: QuizStatus;
+  isAutomatic: boolean;
+  baseScore: number;
+  negativeScore: number;
   scheduledAt: string | null;
   createdAt: string;
   questionCount?: number;
@@ -53,6 +56,9 @@ export interface QuizWithQuestions extends Quiz {
 export interface CreateQuizDto {
   title: string;
   description?: string;
+  isAutomatic?: boolean;
+  baseScore?: number;
+  negativeScore?: number;
   scheduledAt?: string;
 }
 
@@ -60,6 +66,9 @@ export interface UpdateQuizDto {
   title?: string;
   description?: string;
   status?: QuizStatus;
+  isAutomatic?: boolean;
+  baseScore?: number;
+  negativeScore?: number;
   scheduledAt?: string;
 }
 
@@ -76,8 +85,6 @@ export interface Question {
   optionD: string;
   correctOption: OptionLetter;
   timeLimit: number;
-  baseScore: number;
-  negativeScore: number;
   orderIndex: number;
 }
 
@@ -100,8 +107,6 @@ export interface CreateQuestionDto {
   optionD: string;
   correctOption: OptionLetter;
   timeLimit?: number;
-  baseScore?: number;
-  negativeScore?: number;
   orderIndex: number;
 }
 
@@ -113,8 +118,6 @@ export interface UpdateQuestionDto {
   optionD?: string;
   correctOption?: OptionLetter;
   timeLimit?: number;
-  baseScore?: number;
-  negativeScore?: number;
   orderIndex?: number;
 }
 
@@ -227,6 +230,7 @@ export interface InitializeQuizResponse {
     status: string;
     currentQuestionIndex: number;
     totalQuestions: number;
+    isAutomatic: boolean;
   };
   participantCount: number;
   participants: Array<{

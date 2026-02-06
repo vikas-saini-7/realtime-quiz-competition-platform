@@ -44,16 +44,6 @@ export class CreateQuestionDto {
 
   @IsNumber()
   @Min(0)
-  @IsOptional()
-  baseScore?: number;
-
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  negativeScore?: number;
-
-  @IsNumber()
-  @Min(0)
   orderIndex: number;
 }
 
@@ -87,16 +77,6 @@ export class UpdateQuestionDto {
   @Max(120)
   @IsOptional()
   timeLimit?: number;
-
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  baseScore?: number;
-
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  negativeScore?: number;
 
   @IsNumber()
   @Min(0)
