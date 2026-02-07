@@ -24,6 +24,11 @@ import {
   IconSettings,
   IconDeviceFloppy,
   IconX,
+  IconAlertCircle,
+  IconId,
+  IconListNumbers,
+  IconRobot,
+  IconHandFinger,
 } from "@tabler/icons-react";
 import {
   DndContext,
@@ -313,6 +318,7 @@ export default function EditQuizPage() {
   const [editQuestionModalOpen, setEditQuestionModalOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [goLiveModalOpen, setGoLiveModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "card">("list");
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
 
@@ -421,12 +427,16 @@ export default function EditQuizPage() {
     }
   };
 
-  const handleGoLive = async () => {
+  const handleGoLive = () => {
     if (!quiz?.questions?.length) {
       toast.error("Add at least one question before going live");
       return;
     }
+    setGoLiveModalOpen(true);
+  };
 
+  const handleConfirmGoLive = async () => {
+    setGoLiveModalOpen(false);
     try {
       await updateQuiz.mutateAsync({ id: quizId, data: { status: "LIVE" } });
       router.push(`/host/quiz/${quizId}/live`);
@@ -770,6 +780,74 @@ export default function EditQuizPage() {
         onOpenChange={setShareModalOpen}
         quiz={quiz}
       />
+
+      <Dialog open={goLiveModalOpen} onOpenChange={setGoLiveModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Go Live</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-start gap-2">
+                <IconId className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <p className="text-sm">
+                  <strong className="font-semibold text-foreground">
+                    {quiz.title}
+                  </strong>
+                  <span className="font-mono text-muted-foreground ml-1.5">
+                    ({quiz.code})
+                  </span>
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                <IconListNumbers className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <p className="text-sm text-muted-foreground">
+                  {quiz.questions?.length || 0}{" "}
+                  {quiz.questions?.length === 1 ? "question" : "questions"}
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                {quiz.isAutomatic ? (
+                  <IconRobot className="h-4 w-4 text-muted-foreground mt-0.5" />
+                ) : (
+                  <IconHandFinger className="h-4 w-4 text-muted-foreground mt-0.5" />
+                )}
+                <p className="text-sm text-muted-foreground">
+                  {quiz.isAutomatic ? "Automatic" : "Manual"} mode
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 p-4">
+              <div className="flex gap-3">
+                <IconAlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                    Cannot undo after going live
+                  </p>
+                  <p className="text-xs text-amber-800 dark:text-amber-300">
+                    Questions and quiz mode cannot be changed once live
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setGoLiveModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              onClick={handleConfirmGoLive}
+            >
+              <IconPlayerPlay className="h-4 w-4 mr-2" />
+              Go Live
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
