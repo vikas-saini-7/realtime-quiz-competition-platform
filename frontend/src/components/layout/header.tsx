@@ -78,7 +78,7 @@ export function Header() {
           <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary text-primary-foreground">
             <IconBrain className="h-5 w-5" />
           </div>
-          <span className="hidden sm:inline-block bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent font-bold">
+          <span className="hidden sm:inline-block font-bold">
             QuizLive
           </span>
         </Link>
