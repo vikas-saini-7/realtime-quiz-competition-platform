@@ -503,6 +503,13 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       this.logger.log(`User ${user.name} successfully joined quiz ${data.quizId}`);
 
+      // Fetch current participants list and count for the joining user
+      const allUsers = await this.quizStateService.getQuizUsers(data.quizId);
+      const participants = allUsers.map((u) => ({
+        userId: u.userId,
+        userName: u.userName,
+      }));
+
       return {
         success: true,
         quizId: data.quizId,
@@ -510,6 +517,8 @@ export class QuizGateway implements OnGatewayConnection, OnGatewayDisconnect {
         quizTitle: quiz.title,
         status: state.status,
         currentQuestionIndex: state.currentQuestionIndex,
+        participantCount: allUsers.length,
+        participants,
       };
     } catch (error) {
       this.logger.error(

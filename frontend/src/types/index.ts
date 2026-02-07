@@ -219,6 +219,11 @@ export interface JoinQuizResponse {
   quizTitle: string;
   status: string;
   currentQuestionIndex: number;
+  participantCount: number;
+  participants: Array<{
+    userId: string;
+    userName: string;
+  }>;
 }
 
 export interface InitializeQuizResponse {

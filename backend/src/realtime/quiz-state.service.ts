@@ -196,7 +196,11 @@ export class QuizStateService {
     const userData = await this.redisService.hget(usersKey, userId);
 
     if (userData) {
-      const user: JoinedUser = JSON.parse(userData);
+      // Handle both string and already-parsed object (Upstash Redis auto-deserializes JSON)
+      const user: JoinedUser =
+        typeof userData === 'string'
+          ? JSON.parse(userData)
+          : (userData as unknown as JoinedUser);
       user.socketId = socketId;
       await this.redisService.hset(usersKey, userId, JSON.stringify(user));
     }

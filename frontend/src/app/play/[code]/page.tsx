@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { IconCheck, IconX, IconTrophy } from "@tabler/icons-react";
+import { IconCheck, IconX, IconTrophy, IconUsers } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   CountdownTimer,
   ScoreDisplay,
@@ -47,6 +49,7 @@ export default function PlayQuizPage() {
     totalScore,
     leaderboard,
     participantCount,
+    participants,
   } = useQuizStore();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -133,14 +136,68 @@ export default function PlayQuizPage() {
             <p className="text-muted-foreground">Waiting for host to start</p>
           </div>
 
+          {/* Get Ready Card */}
           <Card>
-            <CardContent className="py-12">
+            <CardContent className="py-8">
               <WaitingScreen
                 message="Get ready..."
                 subMessage="The quiz will begin shortly"
+                className="min-h-0 gap-4"
               />
-              <div className="mt-8 flex justify-center">
-                <ParticipantCounter count={participantCount} />
+            </CardContent>
+          </Card>
+
+          {/* Participants List Card */}
+          <Card>
+            <CardContent className="p-4">
+              <div className="rounded-xl bg-gray-500/10 p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <IconUsers className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-base font-semibold">Players</span>
+                  </div>
+                  <Badge variant="secondary" className="tabular-nums">
+                    {participantCount}
+                  </Badge>
+                </div>
+                {participants.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    Waiting for players to join...
+                  </p>
+                ) : (
+                  <ScrollArea className="max-h-[280px] overflow-y-auto">
+                    <div className="space-y-2">
+                      {participants.map((p) => (
+                        <div
+                          key={p.id}
+                          className="flex items-center gap-3 rounded-lg p-2.5 bg-white dark:bg-white/10 transition-colors hover:bg-gray-100 dark:hover:bg-white/15"
+                        >
+                          <Avatar size="sm">
+                            <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium">
+                              {p.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .toUpperCase()
+                                .slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm font-medium truncate flex-1">
+                            {p.name}
+                          </span>
+                          {p.id === user?.id && (
+                            <Badge
+                              variant="outline"
+                              className="text-xs shrink-0"
+                            >
+                              You
+                            </Badge>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
               </div>
             </CardContent>
           </Card>

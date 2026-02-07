@@ -374,7 +374,11 @@ export function useHostActions() {
 
 // Participant actions
 export function useParticipantActions() {
-  const { joinQuiz, submitAnswer: setSubmitAnswer } = useQuizStore();
+  const {
+    joinQuiz,
+    submitAnswer: setSubmitAnswer,
+    setParticipantCount,
+  } = useQuizStore();
 
   const join = useCallback(
     (quizId: string): Promise<JoinQuizResponse> => {
@@ -407,6 +411,21 @@ export function useParticipantActions() {
             console.log("Join response received:", response);
             if (response.success) {
               joinQuiz(response.quizId, response.attemptId, response.quizTitle);
+              // Populate existing participants
+              if (response.participantCount) {
+                setParticipantCount(response.participantCount);
+              }
+              if (response.participants && response.participants.length > 0) {
+                response.participants.forEach((p) => {
+                  useQuizStore
+                    .getState()
+                    .addParticipant(
+                      p.userId,
+                      p.userName,
+                      response.participantCount,
+                    );
+                });
+              }
               resolve(response);
             } else {
               reject(new Error("Failed to join quiz"));
