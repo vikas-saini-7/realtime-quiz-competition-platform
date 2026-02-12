@@ -79,7 +79,7 @@ export function Header() {
             <IconBrain className="h-5 w-5" />
           </div>
           <span className="hidden sm:inline-block font-bold">
-            QuizLive
+            RapidQ
           </span>
         </Link>
 
