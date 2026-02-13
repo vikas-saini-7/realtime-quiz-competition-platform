@@ -74,7 +74,7 @@ export default function LoginPage() {
         <div className="flex justify-center mb-4">
           <div className="flex items-center gap-2">
             <IconBrain className="h-8 w-8" />
-            <span className="text-2xl font-bold">QuizLive</span>
+            <span className="text-2xl font-bold">RapidQ</span>
           </div>
         </div>
         <CardTitle className="text-2xl">Welcome back</CardTitle>

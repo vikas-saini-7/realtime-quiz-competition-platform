@@ -3,8 +3,9 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
-  title: "QuizLive - Real-Time Quiz Competition Platform",
-  description: "Host and participate in live quiz competitions in real-time",
+  title: "RapidQ - Realtime Quiz Competition Platform",
+  description:
+    "RapidQ: Host and participate in realtime quiz competitions. Challenge friends, compete globally, and experience the thrill of live quizzes!",
 };
 
 export default function RootLayout({
