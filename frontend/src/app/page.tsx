@@ -5,12 +5,52 @@ import {
   IconUsers,
   IconBolt,
   IconArrowRight,
+  IconStar,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function HomePage() {
+  // Dummy stats for now; replace with API data as needed
+  const stats = [
+    { label: "Active Competitions", value: 5 },
+    { label: "Total Quizzes Played", value: 123 },
+    { label: "Total Users", value: 78 },
+  ];
+
+  const reviews = [
+    {
+      name: "Amit Sharma",
+      role: "Teacher",
+      text: "Super easy to use and perfect for our school quizzes! The real-time experience is amazing.",
+      initials: "AS",
+      rating: 5,
+    },
+    {
+      name: "Priya Verma",
+      role: "HR Manager",
+      text: "We used this for a company event and everyone loved it. Minimal UI and works great on mobile.",
+      initials: "PV",
+      rating: 5,
+    },
+    {
+      name: "Rahul Singh",
+      role: "Student",
+      text: "Best quiz platform I have tried. Fast, simple, and reliable.",
+      initials: "RS",
+      rating: 4,
+    },
+    {
+      name: "Sneha Kapoor",
+      role: "Quiz Host",
+      text: "Hosting live quizzes is a breeze. The platform is intuitive and support is great!",
+      initials: "SK",
+      rating: 5,
+    },
+  ];
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -44,6 +84,67 @@ export default function HomePage() {
             <Button asChild variant="outline" size="lg" className="rounded-xl">
               <Link href="/host/dashboard">Host Quiz Competition</Link>
             </Button>
+          </div>
+        </section>
+
+        {/* Stats Section */}
+        <section className="container max-w-4xl mx-auto py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="bg-card rounded-2xl py-8 px-4 shadow-sm border border-gray-100 dark:border-neutral-800"
+              >
+                <div className="text-3xl font-bold text-primary mb-2">
+                  {stat.value}
+                </div>
+                <div className="text-muted-foreground text-sm uppercase tracking-wide">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Reviews Section */}
+        <section className="container max-w-7xl mx-auto py-8">
+          <h2 className="text-xl font-semibold mb-6 text-center">
+            What users say
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {reviews.map((review, i) => (
+              <div
+                key={i}
+                className="bg-card rounded-2xl p-6 border border-gray-100 dark:border-neutral-800 flex flex-col gap-4 items-center text-center"
+              >
+                <Avatar size="lg" className="mb-2">
+                  <AvatarFallback>{review.initials}</AvatarFallback>
+                </Avatar>
+                <div className="flex items-center gap-1 justify-center mb-1">
+                  {[...Array(review.rating)].map((_, idx) => (
+                    <IconStar
+                      key={idx}
+                      className="h-4 w-4 text-yellow-400"
+                      fill="#facc15"
+                    />
+                  ))}
+                  {[...Array(5 - review.rating)].map((_, idx) => (
+                    <IconStar key={idx} className="h-4 w-4 text-gray-300" />
+                  ))}
+                </div>
+                <div className="text-muted-foreground text-sm italic">
+                  "{review.text}"
+                </div>
+                <div className="flex flex-col items-center mt-2">
+                  <span className="font-medium text-primary">
+                    {review.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {review.role}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
