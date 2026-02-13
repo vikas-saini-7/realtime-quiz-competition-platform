@@ -235,11 +235,11 @@ export function AddQuestionModal({
                           className="h-11 rounded-xl"
                           {...field}
                           value={
-                            typeof field.value === 'number'
+                            typeof field.value === "number"
                               ? field.value
                               : field.value && !isNaN(Number(field.value))
                                 ? Number(field.value)
-                                : ''
+                                : ""
                           }
                         />
                       </FormControl>
