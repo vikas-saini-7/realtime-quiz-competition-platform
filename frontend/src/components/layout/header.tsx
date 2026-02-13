@@ -68,19 +68,26 @@ export function Header() {
       .slice(0, 2);
   };
 
+  // Determine if on homepage
+  const isHomePage = true;
+
+  // Set header class for homepage dark in light theme
+  const headerClass =
+    isHomePage && theme === "light"
+      ? "sticky top-0 z-50 w-full bg-black/90 text-white backdrop-blur-xl mb-2"
+      : "sticky top-0 z-50 w-full bg-white/80 dark:bg-background/80 backdrop-blur-xl mb-2";
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-white dark:bg-background/80 dark:backdrop-blur-xl mb-2">
+    <header className={headerClass}>
       <div className="container flex h-16 items-center justify-between px-6 max-w-[1600px] mx-auto">
         <Link
           href="/"
           className="flex items-center gap-3 font-semibold text-lg hover:opacity-80 transition-opacity"
         >
-          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary text-primary-foreground">
-            <IconBrain className="h-5 w-5" />
+          <div className="flex items-center justify-center w-9 h-9 p-1 bg-white rounded-sm">
+            <img src="/logo/logo-black.svg" alt="RapidQ Logo" />
           </div>
-          <span className="hidden sm:inline-block font-bold">
-            RapidQ
-          </span>
+          <span className="hidden sm:inline-block font-bold">RapidQ</span>
         </Link>
 
         {isAuthenticated && (

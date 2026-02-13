@@ -20,6 +20,7 @@ export default function RootLayout({
           href="https://api.fontshare.com/v2/css?f[]=satoshi@700,500,400,300&display=swap"
           rel="stylesheet"
         />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       </head>
       <body className="font-sans antialiased">
         <Providers>{children}</Providers>

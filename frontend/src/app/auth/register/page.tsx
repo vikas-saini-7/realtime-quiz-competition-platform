@@ -82,7 +82,9 @@ export default function RegisterPage() {
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
           <div className="flex items-center gap-2">
-            <IconBrain className="h-8 w-8" />
+            <div className="flex items-center justify-center w-9 h-9 p-1 bg-black rounded-sm">
+              <img src="/logo/logo-white.svg" alt="RapidQ Logo" />
+            </div>
             <span className="text-2xl font-bold">RapidQ</span>
           </div>
         </div>

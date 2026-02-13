@@ -18,10 +18,10 @@ export default function HomePage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="container max-w-7xl mx-auto flex flex-col items-center justify-center gap-8 py-20 md:py-32 text-center">
-          {/* <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-sm font-medium">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-sm font-medium">
             <IconBolt className="h-4 w-4" />
             Real-time quiz competitions
-          </div> */}
+          </div>
 
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl">
             Host and Join Live{" "}
