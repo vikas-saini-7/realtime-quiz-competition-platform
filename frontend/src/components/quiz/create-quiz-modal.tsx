@@ -47,7 +47,7 @@ export function CreateQuizModal({ open, onOpenChange }: CreateQuizModalProps) {
   const router = useRouter();
   const createQuiz = useCreateQuiz();
 
-  const form = useForm<CreateQuizFormValues>({
+  const form = useForm({
     resolver: zodResolver(createQuizSchema),
     defaultValues: {
       title: "",

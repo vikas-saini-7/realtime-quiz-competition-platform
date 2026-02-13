@@ -106,7 +106,7 @@ export default function PreviewQuizPage() {
 
   // Results Screen
   if (isComplete) {
-    const maxScore = questions.reduce((sum, q) => sum + (q.baseScore || 10), 0);
+    const maxScore = questions.length * (quiz?.baseScore || 10);
     const accuracy = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
 
     return (

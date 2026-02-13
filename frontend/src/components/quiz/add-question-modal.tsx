@@ -65,7 +65,7 @@ export function AddQuestionModal({
 }: AddQuestionModalProps) {
   const isEditMode = mode === "edit" || !!question;
 
-  const form = useForm<QuestionFormValues>({
+  const form = useForm({
     resolver: zodResolver(questionSchema),
     defaultValues: {
       questionText: "",
@@ -234,6 +234,13 @@ export function AddQuestionModal({
                           max={120}
                           className="h-11 rounded-xl"
                           {...field}
+                          value={
+                            typeof field.value === 'number'
+                              ? field.value
+                              : field.value && !isNaN(Number(field.value))
+                                ? Number(field.value)
+                                : ''
+                          }
                         />
                       </FormControl>
                       <FormMessage />

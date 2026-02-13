@@ -267,7 +267,7 @@ export function PreviewQuizModal({
                         (score /
                           questions.reduce(
                             (sum: number, q: Question) =>
-                              sum + (q.baseScore || 10),
+                              sum + (quiz.baseScore || 10),
                             0,
                           )) *
                           100,

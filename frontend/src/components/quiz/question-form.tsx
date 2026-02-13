@@ -66,8 +66,8 @@ export function QuestionForm({
       optionD: question?.optionD || "",
       correctOption: question?.correctOption || "A",
       timeLimit: question?.timeLimit || 30,
-      baseScore: question?.baseScore || 100,
-      negativeScore: question?.negativeScore || 25,
+      baseScore: 100,
+      negativeScore: 25,
     },
   });
 
