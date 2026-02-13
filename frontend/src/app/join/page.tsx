@@ -73,15 +73,6 @@ export default function JoinPage() {
 
   return (
     <div className="container py-12 max-w-2xl mx-auto">
-      <div className="flex items-center gap-4 mb-8">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/">
-            <IconArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <h1 className="text-2xl font-semibold">Join Quiz</h1>
-      </div>
-
       <div className="space-y-8">
         <div className="text-center space-y-2">
           <h2 className="text-3xl font-bold">Enter Quiz Code</h2>
@@ -104,7 +95,7 @@ export default function JoinPage() {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={handlePaste}
-              className="w-20 h-20 text-center text-3xl font-semibold border border-gray-300 dark:border-gray-800 rounded-xl outline-none transition-all uppercase bg-muted/30 dark:bg-muted/20"
+              className="w-24 h-24 text-center text-4xl font-semibold border border-gray-200 dark:border-gray-700 rounded-xl outline-none transition-all uppercase bg-gray-50 dark:bg-neutral-900"
               placeholder=""
               autoComplete="off"
             />
@@ -126,7 +117,7 @@ export default function JoinPage() {
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               onPaste={handlePaste}
-              className="w-20 h-20 text-center text-3xl font-semibold border border-gray-300 dark:border-gray-800 rounded-xl outline-none transition-all uppercase bg-muted/30 dark:bg-muted/20"
+              className="w-24 h-24 text-center text-4xl font-semibold border border-gray-200 dark:border-gray-700 rounded-xl outline-none transition-all uppercase bg-gray-50 dark:bg-neutral-900"
               placeholder=""
               autoComplete="off"
             />
@@ -134,8 +125,13 @@ export default function JoinPage() {
         </div>
 
         <p className="text-center text-sm text-muted-foreground">
-          Example: ABC-123
+          Example: XXX-XXX
         </p>
+        <div className="flex justify-center mt-10">
+          <Button variant="outline" asChild>
+            <Link href="/">Go Home</Link>
+          </Button>
+        </div>
       </div>
     </div>
   );
