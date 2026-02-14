@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { IconLoader2 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import type { Question } from "@/types";
+import { AIQuestionModal } from "./ai-question-modal";
 
 const questionSchema = z.object({
   questionText: z.string().min(1, "Question is required"),
@@ -63,6 +64,45 @@ export function AddQuestionModal({
   mode = "create",
 }: AddQuestionModalProps) {
   const isEditMode = mode === "edit" || !!question;
+  const [aiModalOpen, setAiModalOpen] = useState(false);
+  // Handler to receive AI question and fill form
+  type AIQuestion = Partial<
+    Pick<
+      Question,
+      | "questionText"
+      | "optionA"
+      | "optionB"
+      | "optionC"
+      | "optionD"
+      | "correctOption"
+      | "timeLimit"
+    >
+  > & {
+    question?: string;
+    options?: { A?: string; B?: string; C?: string; D?: string };
+    answer?: string;
+  };
+  const handleAIResult = (q: AIQuestion) => {
+    form.setValue("questionText", q.questionText || q.question || "");
+    form.setValue("optionA", q.optionA || q.options?.A || "");
+    form.setValue("optionB", q.optionB || q.options?.B || "");
+    form.setValue("optionC", q.optionC || q.options?.C || "");
+    form.setValue("optionD", q.optionD || q.options?.D || "");
+    // Ensure only 'A' | 'B' | 'C' | 'D' is passed
+    const correct = q.correctOption || q.answer;
+    const validOptions = ["A", "B", "C", "D"] as const;
+    function isOptionLetter(
+      val: unknown,
+    ): val is (typeof validOptions)[number] {
+      return (
+        typeof val === "string" &&
+        validOptions.includes(val as (typeof validOptions)[number])
+      );
+    }
+    const correctOption = isOptionLetter(correct) ? correct : "A";
+    form.setValue("correctOption", correctOption);
+    form.setValue("timeLimit", q.timeLimit || 30);
+  };
 
   const form = useForm({
     resolver: zodResolver(questionSchema),
@@ -123,15 +163,29 @@ export function AddQuestionModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto rounded-3xl">
-        <DialogHeader className="space-y-3">
-          <DialogTitle className="text-2xl font-bold">
-            {isEditMode ? "Edit Question" : "Add New Question"}
-          </DialogTitle>
-          {/* <DialogDescription className="text-base">
-            Create a new question for your quiz
-          </DialogDescription> */}
+        <DialogHeader className="space-y-3 flex flex-row items-center justify-between">
+          <div>
+            <DialogTitle className="text-2xl font-bold">
+              {isEditMode ? "Edit Question" : "Add New Question"}
+            </DialogTitle>
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="ml-4"
+            onClick={() => setAiModalOpen(true)}
+          >
+            Fill with AI
+          </Button>
         </DialogHeader>
+        <AIQuestionModal
+          open={aiModalOpen}
+          onOpenChange={setAiModalOpen}
+          onResult={handleAIResult}
+        />
 
+        {/* AI modal is now in header, button removed from here */}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
