@@ -3,7 +3,6 @@ import {
   IconBrain,
   IconDeviceGamepad2,
   IconUsers,
-  IconBolt,
   IconArrowRight,
   IconStar,
 } from "@tabler/icons-react";
@@ -58,14 +57,18 @@ export default function HomePage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="container max-w-7xl mx-auto flex flex-col items-center justify-center gap-8 py-20 md:py-32 text-center">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary text-sm font-medium">
-            <IconBolt className="h-4 w-4" />
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-500/10 text-sm font-medium">
+            <span
+              className="inline-block w-3 h-3 rounded-full bg-green-500 animate-pulse mr-2"
+              title="Live"
+            />
             Real-time quiz competitions
           </div>
 
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl">
-            Host and Join Live{" "}
-            <span className="text-primary">Quiz Competitions</span>
+            Play or Host{" "}
+            <span className="text-primary">Quiz Competitions</span>{" "}
+            within minutes!
           </h1>
 
           <p className="max-w-2xl text-lg text-muted-foreground md:text-xl">
@@ -81,7 +84,12 @@ export default function HomePage() {
                 <IconArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="rounded-xl">
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="rounded-xl bg-gray-500/10"
+            >
               <Link href="/host/dashboard">Host Quiz Competition</Link>
             </Button>
           </div>
@@ -93,7 +101,7 @@ export default function HomePage() {
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="bg-card rounded-2xl py-8 px-4 shadow-sm border border-gray-100 dark:border-neutral-800"
+                className="rounded-2xl py-8 px-4  bg-gray-500/10"
               >
                 <div className="text-3xl font-bold text-primary mb-2">
                   {stat.value}
@@ -115,10 +123,12 @@ export default function HomePage() {
             {reviews.map((review, i) => (
               <div
                 key={i}
-                className="bg-card rounded-2xl p-6 border border-gray-100 dark:border-neutral-800 flex flex-col gap-4 items-center text-center"
+                className="rounded-2xl p-6 bg-gray-500/10 flex flex-col gap-4 items-center text-center"
               >
                 <Avatar size="lg" className="mb-2">
-                  <AvatarFallback>{review.initials}</AvatarFallback>
+                  <AvatarFallback className="bg-white dark:bg-gray-500/10">
+                    {review.initials}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex items-center gap-1 justify-center mb-1">
                   {[...Array(review.rating)].map((_, idx) => (
@@ -148,67 +158,22 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Features Section */}
-        {/* <section className="container max-w-7xl mx-auto py-20">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Everything you need for{" "}
-              <span className="text-primary">live competitions</span>
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              A complete platform designed for real-time quiz competitions with
-              powerful features and seamless experience
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="group flex flex-col items-center text-center gap-4 p-8 rounded-2xl bg-card hover:shadow-lg transition-all">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <IconBrain className="h-7 w-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold">Create Quizzes</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Build engaging quizzes with multiple choice questions, set time
-                limits, and customize scoring rules to match your needs
-              </p>
-            </div>
-
-            <div className="group flex flex-col items-center text-center gap-4 p-8 rounded-2xl bg-card hover:shadow-lg transition-all">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <IconUsers className="h-7 w-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold">Invite Participants</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Share a simple code or QR code for instant access. Works
-                seamlessly on any device with a browser
-              </p>
-            </div>
-
-            <div className="group flex flex-col items-center text-center gap-4 p-8 rounded-2xl bg-card hover:shadow-lg transition-all">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <IconDeviceGamepad2 className="h-7 w-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold">Compete Live</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Answer questions in real-time, climb the leaderboard, and see
-                results instantly with live updates
-              </p>
-            </div>
-          </div>
-        </section> */}
 
         {/* CTA Section */}
         <section className="container max-w-7xl mx-auto py-24">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-500/10 via-gray-500/5 to-gray-500/5 p-12 md:p-16">
             <div className="relative z-10 flex flex-col items-center text-center gap-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10">
-                <IconBolt className="h-4 w-4 text-primary" />
+                <span
+                  className="inline-block w-3 h-3 rounded-full bg-green-500 animate-pulse mr-2"
+                  title="Live"
+                />
                 <span className="text-sm font-semibold text-primary">
                   Start for Free
                 </span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold max-w-2xl">
-                Ready to host your first quiz competition?
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold max-w-2xl">
+                Host your first Quiz?
               </h2>
               <p className="text-muted-foreground text-lg max-w-xl">
                 Create engaging quizzes in minutes and invite participants to
@@ -221,14 +186,14 @@ export default function HomePage() {
                     <IconArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button
+                {/* <Button
                   asChild
                   variant="outline"
                   size="lg"
                   className="rounded-xl"
                 >
                   <Link href="/join">Join a Quiz</Link>
-                </Button>
+                </Button> */}
               </div>
             </div>
             <div className="absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(white,transparent_85%)]" />

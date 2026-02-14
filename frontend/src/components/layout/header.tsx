@@ -75,7 +75,7 @@ export function Header() {
   const headerClass =
     isHomePage && theme === "light"
       ? "sticky top-0 z-50 w-full bg-black/90 text-white backdrop-blur-xl mb-2"
-      : "sticky top-0 z-50 w-full bg-white/80 dark:bg-background/80 backdrop-blur-xl mb-2";
+      : "sticky top-0 z-50 w-full bg-white/80 dark:bg-background/80 dark:border-b border-gray-500/10  backdrop-blur-xl mb-2";
 
   return (
     <header className={headerClass}>
