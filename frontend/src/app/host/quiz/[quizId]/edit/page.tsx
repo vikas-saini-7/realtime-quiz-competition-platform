@@ -29,6 +29,8 @@ import {
   IconListNumbers,
   IconRobot,
   IconHandFinger,
+  IconAi,
+  IconSparkles2,
 } from "@tabler/icons-react";
 import {
   DndContext,
@@ -52,16 +54,13 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { FormDescription } from "@/components/ui/form";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -70,24 +69,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CardSkeleton } from "@/components/ui/card-skeleton";
 import { QuizStatusBadge } from "@/components/quiz/quiz-status-badge";
 import { AddQuestionModal } from "@/components/quiz/add-question-modal";
 import { ShareQuizModal } from "@/components/quiz/share-quiz-modal";
@@ -99,7 +82,7 @@ import {
   useDeleteQuestion,
 } from "@/hooks";
 import { toast } from "sonner";
-import type { Question, OptionLetter } from "@/types";
+import type { Question } from "@/types";
 
 const questionSchema = z.object({
   questionText: z.string().min(1, "Question is required"),
