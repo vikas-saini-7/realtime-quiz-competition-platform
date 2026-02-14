@@ -32,7 +32,7 @@ export default function ProfilePage() {
   const totalScore = attempts?.reduce((sum, a) => sum + a.totalScore, 0) || 0;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 bg-gray-500/10 p-4 px-8 rounded-lg">
       <div>
         <h1 className="text-2xl font-bold">Profile</h1>
         <p className="text-muted-foreground">
@@ -61,10 +61,10 @@ export default function ProfilePage() {
               <IconMail className="h-5 w-5 text-muted-foreground" />
               <span>{user.email}</span>
             </div>
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <IconShield className="h-5 w-5 text-muted-foreground" />
               <span>Can create, host, and participate in quizzes</span>
-            </div>
+            </div> */}
             {user.createdAt && (
               <div className="flex items-center gap-3">
                 <IconCalendar className="h-5 w-5 text-muted-foreground" />
@@ -86,11 +86,11 @@ export default function ProfilePage() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="py-8">
+            <div className="py-2">
               <LoadingSpinner size="lg" message="Loading statistics..." />
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="text-center p-4 rounded-lg bg-secondary/50">
                 <p className="text-3xl font-bold">{totalQuizzes}</p>
                 <p className="text-sm text-muted-foreground">Quizzes Joined</p>
@@ -99,12 +99,12 @@ export default function ProfilePage() {
                 <p className="text-3xl font-bold">{completedQuizzes}</p>
                 <p className="text-sm text-muted-foreground">Completed</p>
               </div>
-              <div className="text-center p-4 rounded-lg bg-secondary/50">
+              {/* <div className="text-center p-4 rounded-lg bg-secondary/50">
                 <p className="text-3xl font-bold">
                   {totalScore.toLocaleString()}
                 </p>
                 <p className="text-sm text-muted-foreground">Total Points</p>
-              </div>
+              </div> */}
             </div>
           )}
         </CardContent>
