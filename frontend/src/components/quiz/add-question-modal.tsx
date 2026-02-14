@@ -66,41 +66,22 @@ export function AddQuestionModal({
   const isEditMode = mode === "edit" || !!question;
   const [aiModalOpen, setAiModalOpen] = useState(false);
   // Handler to receive AI question and fill form
-  type AIQuestion = Partial<
-    Pick<
-      Question,
-      | "questionText"
-      | "optionA"
-      | "optionB"
-      | "optionC"
-      | "optionD"
-      | "correctOption"
-      | "timeLimit"
-    >
-  > & {
-    question?: string;
-    options?: { A?: string; B?: string; C?: string; D?: string };
-    answer?: string;
+  type AIQuestion = {
+    questionText: string;
+    optionA: string;
+    optionB: string;
+    optionC: string;
+    optionD: string;
+    correctOption: "A" | "B" | "C" | "D";
+    timeLimit?: number;
   };
   const handleAIResult = (q: AIQuestion) => {
-    form.setValue("questionText", q.questionText || q.question || "");
-    form.setValue("optionA", q.optionA || q.options?.A || "");
-    form.setValue("optionB", q.optionB || q.options?.B || "");
-    form.setValue("optionC", q.optionC || q.options?.C || "");
-    form.setValue("optionD", q.optionD || q.options?.D || "");
-    // Ensure only 'A' | 'B' | 'C' | 'D' is passed
-    const correct = q.correctOption || q.answer;
-    const validOptions = ["A", "B", "C", "D"] as const;
-    function isOptionLetter(
-      val: unknown,
-    ): val is (typeof validOptions)[number] {
-      return (
-        typeof val === "string" &&
-        validOptions.includes(val as (typeof validOptions)[number])
-      );
-    }
-    const correctOption = isOptionLetter(correct) ? correct : "A";
-    form.setValue("correctOption", correctOption);
+    form.setValue("questionText", q.questionText);
+    form.setValue("optionA", q.optionA);
+    form.setValue("optionB", q.optionB);
+    form.setValue("optionC", q.optionC);
+    form.setValue("optionD", q.optionD);
+    form.setValue("correctOption", q.correctOption);
     form.setValue("timeLimit", q.timeLimit || 30);
   };
 

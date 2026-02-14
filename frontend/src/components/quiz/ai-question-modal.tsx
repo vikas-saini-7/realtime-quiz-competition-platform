@@ -68,13 +68,30 @@ export function AIQuestionModal({
         difficulty: difficulty as "easy" | "medium" | "hard",
         numberOfQuestions: 1,
       });
-      const questions = aiResult?.data?.questions || aiResult?.questions;
+      const questions =
+        aiResult?.data?.questions || aiResult?.questions || aiResult;
       if (!questions || !questions.length) {
         toast.error("AI did not return a question");
         setLoading(false);
         return;
       }
-      onResult(questions[0]);
+      // Map backend format to frontend format
+      const backendQ = questions[0];
+      const optionsArr = backendQ.options || [];
+      const correctIdx = optionsArr.findIndex(
+        (opt: string) => opt === backendQ.correctAnswer,
+      );
+      const optionLetters = ["A", "B", "C", "D"] as const;
+      const mapped = {
+        questionText: backendQ.question || "",
+        optionA: optionsArr[0] || "",
+        optionB: optionsArr[1] || "",
+        optionC: optionsArr[2] || "",
+        optionD: optionsArr[3] || "",
+        correctOption: optionLetters[correctIdx] || "A",
+        timeLimit: 30,
+      };
+      onResult(mapped);
       onOpenChange(false);
       toast.success("AI question generated!");
     } catch {

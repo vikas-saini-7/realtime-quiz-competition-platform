@@ -31,7 +31,7 @@ export class AiService {
     try {
       const response: any = await firstValueFrom(
         this.httpService.post(
-          'https://api-inference.huggingface.co/models/google/flan-t5-large',
+          'https://router.huggingface.co/hf-inference/models/mistralai/Mistral-7B-Instruct-v0.2',
           { inputs: prompt },
           {
             headers: {
@@ -41,6 +41,7 @@ export class AiService {
           },
         ),
       );
+      console.log('HuggingFace raw response:', JSON.stringify(response.data, null, 2));
       const aiOutput =
         response?.data?.[0]?.generated_text ||
         response?.data?.generated_text ||
@@ -48,10 +49,12 @@ export class AiService {
       let quiz: QuizQuestion[];
       try {
         quiz = JSON.parse(aiOutput);
-      } catch {
+      } catch (e) {
+        console.error('Failed to parse AI output:', aiOutput, e);
         throw new BadRequestException('AI response is not valid JSON');
       }
       if (!Array.isArray(quiz) || quiz.length !== numberOfQuestions) {
+        console.error('AI response does not match required format:', quiz);
         throw new BadRequestException('AI response does not match required format');
       }
       for (const q of quiz) {
@@ -62,11 +65,13 @@ export class AiService {
           typeof q.correctAnswer !== 'string' ||
           !q.options.includes(q.correctAnswer)
         ) {
+          console.error('Invalid question format:', q);
           throw new BadRequestException('Invalid question format');
         }
       }
       return quiz;
     } catch (error: any) {
+      console.error('AI Service error:', error?.response?.data || error);
       if (error instanceof BadRequestException) throw error;
       throw new InternalServerErrorException('Failed to generate quiz');
     }

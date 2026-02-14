@@ -10,6 +10,7 @@ import { AttemptsModule } from './attempts';
 import { AnswersModule } from './answers';
 import { LeaderboardModule } from './leaderboard';
 import { RealtimeModule } from './realtime';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RealtimeModule } from './realtime';
 
     // Real-time module
     RealtimeModule,
+    AiModule,
   ],
 })
 export class AppModule {}
