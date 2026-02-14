@@ -66,23 +66,37 @@ export function AddQuestionModal({
   const isEditMode = mode === "edit" || !!question;
   const [aiModalOpen, setAiModalOpen] = useState(false);
   // Handler to receive AI question and fill form
+  // Use the same AIQuestion type as in AIQuestionModal
   type AIQuestion = {
-    questionText: string;
-    optionA: string;
-    optionB: string;
-    optionC: string;
-    optionD: string;
-    correctOption: "A" | "B" | "C" | "D";
+    questionText?: string;
+    optionA?: string;
+    optionB?: string;
+    optionC?: string;
+    optionD?: string;
+    correctOption?: "A" | "B" | "C" | "D";
     timeLimit?: number;
   };
   const handleAIResult = (q: AIQuestion) => {
-    form.setValue("questionText", q.questionText);
-    form.setValue("optionA", q.optionA);
-    form.setValue("optionB", q.optionB);
-    form.setValue("optionC", q.optionC);
-    form.setValue("optionD", q.optionD);
-    form.setValue("correctOption", q.correctOption);
-    form.setValue("timeLimit", q.timeLimit || 30);
+    form.setValue("questionText", q.questionText ?? "");
+    form.setValue("optionA", q.optionA ?? "");
+    form.setValue("optionB", q.optionB ?? "");
+    form.setValue("optionC", q.optionC ?? "");
+    form.setValue("optionD", q.optionD ?? "");
+
+    // Match correctAnswer string to option letter
+    const options = [q.optionA, q.optionB, q.optionC, q.optionD];
+    const correctAnswer = (q as any).correctAnswer;
+    let correctOption: "A" | "B" | "C" | "D" = "A";
+    const idx = options.findIndex((opt) => opt === correctAnswer);
+    if (idx !== -1) {
+      correctOption = ["A", "B", "C", "D"][idx];
+    }
+    form.setValue("correctOption", correctOption);
+
+    form.setValue(
+      "timeLimit",
+      typeof q.timeLimit === "number" ? q.timeLimit : 30,
+    );
   };
 
   const form = useForm({

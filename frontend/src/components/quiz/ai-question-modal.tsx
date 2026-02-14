@@ -68,14 +68,13 @@ export function AIQuestionModal({
         difficulty: difficulty as "easy" | "medium" | "hard",
         numberOfQuestions: 1,
       });
-      const questions =
-        aiResult?.data?.questions || aiResult?.questions || aiResult;
-      if (!questions || !questions.length) {
+      // The backend returns { success, data: [ { question, options, correctAnswer } ], timestamp }
+      const questions = aiResult?.data || aiResult?.questions || aiResult;
+      if (!questions || !Array.isArray(questions) || !questions.length) {
         toast.error("AI did not return a question");
         setLoading(false);
         return;
       }
-      // Map backend format to frontend format
       const backendQ = questions[0];
       const optionsArr = backendQ.options || [];
       const correctIdx = optionsArr.findIndex(
