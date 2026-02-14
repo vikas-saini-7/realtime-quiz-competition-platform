@@ -74,6 +74,7 @@ export function AddQuestionModal({
     optionC?: string;
     optionD?: string;
     correctOption?: "A" | "B" | "C" | "D";
+    correctAnswer?: string;
     timeLimit?: number;
   };
   const handleAIResult = (q: AIQuestion) => {
@@ -85,11 +86,12 @@ export function AddQuestionModal({
 
     // Match correctAnswer string to option letter
     const options = [q.optionA, q.optionB, q.optionC, q.optionD];
-    const correctAnswer = (q as any).correctAnswer;
     let correctOption: "A" | "B" | "C" | "D" = "A";
-    const idx = options.findIndex((opt) => opt === correctAnswer);
-    if (idx !== -1) {
-      correctOption = ["A", "B", "C", "D"][idx];
+    if (q.correctAnswer) {
+      const idx = options.findIndex((opt) => opt === q.correctAnswer);
+      if (idx !== -1) {
+        correctOption = ["A", "B", "C", "D"][idx] as "A" | "B" | "C" | "D";
+      }
     }
     form.setValue("correctOption", correctOption);
 
@@ -157,7 +159,7 @@ export function AddQuestionModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto rounded-3xl">
+      <DialogContent className="sm:max-w-175 max-h-[90vh] overflow-y-auto rounded-3xl">
         <DialogHeader className="space-y-3 flex flex-row items-center justify-between">
           <div>
             <DialogTitle className="text-2xl font-bold">
@@ -197,7 +199,7 @@ export function AddQuestionModal({
                   <FormControl>
                     <Textarea
                       placeholder="Enter your question..."
-                      className="resize-none min-h-[100px] rounded-xl"
+                      className="resize-none min-h-25 rounded-xl"
                       {...field}
                     />
                   </FormControl>
