@@ -66,8 +66,7 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl">
-            Play or Host{" "}
-            <span className="text-primary">Quiz Competitions</span>{" "}
+            Play or Host <span className="text-primary">Quiz Competitions</span>{" "}
             within minutes!
           </h1>
 
@@ -157,7 +156,6 @@ export default function HomePage() {
             ))}
           </div>
         </section>
-
 
         {/* CTA Section */}
         <section className="container max-w-7xl mx-auto py-24">
